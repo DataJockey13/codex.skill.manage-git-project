@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-19",
+  "explicit_user_request": "Neues Projekt unter /Users/dj/Source/codex.skill.manage-git-project für die weitere Skill-Entwicklung; notwendige Dateien übertragen, Startprompt erstellen und Entwicklungsdateien aus dem bisherigen Projekt entfernen",
+  "source_project": "/Users/dj/Documents/server.hostinger",
+  "source_commit": "d8c92618c409f4bbb924539f4fde6f44bfccde3a",
+  "destination_project": "/Users/dj/Source/codex.skill.manage-git-project",
+  "files": [
+    {
+      "source": "implementation/agent-skills/manage-git-project/SKILL.md",
+      "destination": "manage-git-project/SKILL.md",
+      "sha256": "4dd363aec250372a710ed8f41d87697baa7109bbc1811765437cc58e9db2cb6c",
+      "bytes": 5986,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": "implementation/agent-skills/manage-git-project/references/closure.md",
+      "destination": "manage-git-project/references/closure.md",
+      "sha256": "46b07129fcf060d69f4ae95bee30f472d7c67153294b16c4fda267c80ed3b25e",
+      "bytes": 6053,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": "implementation/agent-skills/manage-git-project/scripts/project.py",
+      "destination": "manage-git-project/scripts/project.py",
+      "sha256": "9d6075d81ca0b9dab096b5e9a0d92061d2b6d28df4d5728ecacdfd19ab0b2e54",
+      "bytes": 27462,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": "implementation/agent-skills/manage-git-project/tests/test_project.py",
+      "destination": "manage-git-project/tests/test_project.py",
+      "sha256": "5e1f2afbc36deeafcfaad5059dfb1bea9d428bb3bfaa617c10bb78eef40d9366",
+      "bytes": 21018,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": "docs/revision/2026-10-19/manage-git-project.md",
+      "destination": "docs/origin/2026-10-19/manage-git-project.md",
+      "sha256": "f12ce6d47476293287455a419c4f9a0ba93c63e024934b00ceb84721f8653595",
+      "bytes": 6268,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": "docs/revision/2026-10-19/manage-git-project.json",
+      "destination": "docs/origin/2026-10-19/manage-git-project.json",
+      "sha256": "aabb559fce38fa2703513f8bb987e3e085169e186252c2e151305de1454721d5",
+      "bytes": 6045,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": "docs/revision/2026-10-19/validation.json",
+      "destination": "docs/origin/2026-10-19/validation.json",
+      "sha256": "072d1ea8131730b9c66848224c594a351367240040bf974b96b7c723452fb342",
+      "bytes": 3749,
+      "remove_from_old_project": false
+    },
+    {
+      "source": ".local/manage-git-project-tests.log",
+      "destination": "docs/origin/2026-10-19/manage-git-project-tests.log",
+      "sha256": "0dab13532bf7cdee85781f5304ed4ed8e8d494cbedc4d0750426e477f06b83c9",
+      "bytes": 3328,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": ".local/manage-git-project-tests-result.json",
+      "destination": "docs/origin/2026-10-19/manage-git-project-tests-result.json",
+      "sha256": "e335a1a472155f6fd5a4398e81fcda0ca678bfec9c67d574149422dee7678153",
+      "bytes": 281,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": ".local/manage-git-project-skill-validation.log",
+      "destination": "docs/origin/2026-10-19/manage-git-project-skill-validation.log",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": ".local/manage-git-project-audit.log",
+      "destination": "docs/origin/2026-10-19/manage-git-project-audit.log",
+      "sha256": "d50028b1c43c878a27c54b7770f1e20856c00640e067961868590daf6406f14b",
+      "bytes": 2481,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": ".local/manage-git-project-wiki-lint.log",
+      "destination": "docs/origin/2026-10-19/manage-git-project-wiki-lint.log",
+      "sha256": "c1579c085c134f73bcac492d93918ded0d557c1b6e517ab44088ae09d5257f8f",
+      "bytes": 353811,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": ".local/manage-git-project-final-check.json",
+      "destination": "docs/origin/2026-10-19/manage-git-project-final-check.json",
+      "sha256": "e718605520b01e905530eeffd0ff93f6fcd4de40ee4dac2cbad0a258ebbafe27",
+      "bytes": 873,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    },
+    {
+      "source": ".local/manage-git-project-precommit-check.json",
+      "destination": "docs/origin/2026-10-19/manage-git-project-precommit-check.json",
+      "sha256": "b7963304b540e179411631b6a36ffc45371a3d47f66e0bf8c5f39ba7c9e3a20d",
+      "bytes": 5923,
+      "remove_from_old_project": true,
+      "removed_from_old_project": true
+    }
+  ],
+  "skill_source_unchanged": true,
+  "global_agents_unchanged": true,
+  "remote_configured": false,
+  "notes": [
+    "Der erste Commit initialisiert nur .gitignore, damit der Skill einen bestehenden Integrationsbranch und ignorierten Aufgabenstatus vor der Dateiübernahme prüfen kann.",
+    "Die archivierten Einführungsbelege enthalten unverändert die damals geltenden Pfade und Projektprüfungen; aktuelle Ablage und Testbefehle stehen im neuen README.",
+    "Die bestehende Git-Historie des bisherigen Projekts wird nicht umgeschrieben."
+  ],
+  "installed_skill": "/Users/dj/.agents/skills/manage-git-project",
+  "installation_resolves_to": "/Users/dj/Source/codex.skill.manage-git-project/manage-git-project",
+  "transfer_complete": true
+}

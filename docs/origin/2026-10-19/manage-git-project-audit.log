@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-19",
+  "wiki_concepts": 29,
+  "maintained_local_links_checked": 1310,
+  "source_manifest_statuses": {
+    "processed": 79,
+    "removed": 1,
+    "pending": 4598
+  },
+  "historical_log_preservation": {
+    "wiki/log.md": {
+      "historical_entries": 369,
+      "missing_entries": 0
+    },
+    "sources/decisions/log.md": {
+      "historical_entries": 328,
+      "missing_entries": 0
+    }
+  },
+  "chat_cleanup": {
+    "absent_paths": [
+      "docs/revision/2026-10-18/chats",
+      "docs/revision/2026-10-18/chat-inventory.json",
+      "docs/revision/2026-10-18/referenced-paths.json",
+      "implementation/project-audit/collect_chats.py",
+      ".local/revision-private-chat-values.json"
+    ],
+    "remaining_paths": [],
+    "protocol": "docs/revision/2026-10-18/chat-cleanup.md",
+    "original_codex_chats_changed": false,
+    "git_history_rewritten": true,
+    "history_report": "docs/revision/2026-10-18/history-cleanup.json",
+    "excluded_historical_blobs_checked": 144,
+    "remaining_historical_blobs": [],
+    "remaining_payload_history_entries": 0,
+    "github_support_request": "declined_by_user; not sent"
+  },
+  "registered_worktrees": [
+    "/Users/dj/Documents/server.hostinger"
+  ],
+  "root_instruction_files": {
+    "wiki_md_unchanged": true,
+    "agents_md_change_explicitly_authorized": true,
+    "agents_md_matches_recorded_sha256": true,
+    "authorization_report": "docs/revision/2026-10-19/manage-git-project.json",
+    "global_agents_matches_recorded_sha256": true
+  },
+  "manage_git_project": {
+    "canonical_installation_verified": true,
+    "behavior_tests": 37,
+    "behavior_test_failures": 0,
+    "native_platform": "darwin",
+    "native_windows_tested": false
+  },
+  "branch_cleanup": {
+    "local_branches_removed": 21,
+    "remote_branches_removed": 11,
+    "orphan_worktrees_removed": 2,
+    "removed_worktree_files_covered_by_main": 756,
+    "remote_deletion_verified_at": "2026-10-18T14:09:05.188142+00:00",
+    "remote_snapshot": [
+      "refs/heads/main"
+    ],
+    "remote_check_rerun": false
+  },
+  "external_cleanup": {
+    "recovered_groups": 79,
+    "unique_files_or_links_preserved": 659,
+    "identical_files_deduplicated": 4724,
+    "external_logo_copies_removed": 3,
+    "empty_codex_worktree_roots_removed": 20,
+    "hermes_worktrees_moved_inside_project": 2,
+    "runtime_and_native_branches_unchanged_at_migration": true,
+    "report": "docs/revision/2026-10-18/external-cleanup.json"
+  },
+  "errors": []
+}

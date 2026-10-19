@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-19",
+  "user_request": "Erstelle den Skill manage-git-project mit den nötigen Prüfskripten, verankere seine verbindliche Nutzung in der benutzerweiten AGENTS.md, passe die Projekt-AGENTS.md an und teste den Ablauf.",
+  "canonical_skill": "implementation/agent-skills/manage-git-project",
+  "installed_skill": "/Users/dj/.agents/skills/manage-git-project",
+  "installation": "symlink_to_canonical_project_source",
+  "instruction_change": {
+    "explicit_user_authorization": true,
+    "project_agents_sha256_before": "bec445cfcdd599300fadf2871750403cbc0b62eb3351948313bfecfcec6ec6be",
+    "project_agents_sha256_after": "62c81ef8b187f8666cc0d134828149da62ac820e170df04665090fe7786f9276",
+    "global_agents_path": "/Users/dj/.codex/AGENTS.md",
+    "global_agents_sha256_before": "e27dcb071fd34de971c023b6794039887f65f3acb60c52c66073f43d9874544d",
+    "global_agents_sha256_after": "7f2afe467a51c0c7b5f8d15dfefd70af70f403c6683e26ed16e93b0555b57393",
+    "wiki_md_unchanged": true
+  },
+  "global_agents_managed_block": "<!-- manage-git-project:start -->\n## Verbindliche Arbeit in Git-Projekten\n\n- Bei Aufgaben mit Dateiänderungen in Git-Projekten MUSS der Skill\n  `$manage-git-project` vor den Änderungen und zum Aufgabenabschluss verwendet\n  werden. Reine Lesefragen erzeugen keinen Aufgabenstatus und keine Dateien.\n- Bestimme kanonisches Projektverzeichnis und Integrationsziel aus Auftrag und\n  Projektanweisungen. Alle projektbezogenen Arbeitsdateien, Ergebnisse,\n  temporären Bestände und zusätzlichen Worktrees gehören in dieses Projekt.\n  Allgemeine installierte Werkzeuge und ausdrücklich beauftragte benutzerweite\n  Konfiguration bleiben an ihren vorgesehenen Betriebsorten.\n- Eine Aufgabe ist erst vollständig abgeschlossen, wenn relevante Ergebnisse\n  kanonisch abgelegt, angemessen geprüft, gemäß Projektregeln committed und\n  integriert sowie erledigte eigene Zweige und Arbeitskopien bereinigt sind.\n  Commit-/Push-Regeln und erforderliche Reviews/Freigaben des Projekts gelten.\n- Fremde Arbeit und einzigartige Daten erhalten. Verworfene Versuche nicht\n  automatisch mergen; nur gemäß klarer Verwerfungsentscheidung gezielt entfernen.\n  Tatsächlich offene Arbeit mit konkretem Zweck als Übergabe ausweisen.\n- Den Abschluss mit den Prüfskripten des Skills belegen. Der kooperative Lock\n  ersetzt nicht die Prüfung anderer aktiver Schreiber. Weder ein sauberer\n  Git-Status noch ein pauschales „erledigt“ ersetzen den Abgleich ignorierter\n  Dateien, unveröffentlichter Änderungen und bekannter externer Artefakte.\n<!-- manage-git-project:end -->\n",
+  "baseline_head": "5845717dd88dea98c0b8dfb0078c9402f7d3aaf0",
+  "baseline_unpushed_commits": 1,
+  "native_windows_tested": false,
+  "remote_writes_in_automated_tests": false,
+  "skill_file_sha256": {
+    "SKILL.md": "4dd363aec250372a710ed8f41d87697baa7109bbc1811765437cc58e9db2cb6c",
+    "references/closure.md": "46b07129fcf060d69f4ae95bee30f472d7c67153294b16c4fda267c80ed3b25e",
+    "scripts/project.py": "9d6075d81ca0b9dab096b5e9a0d92061d2b6d28df4d5728ecacdfd19ab0b2e54",
+    "tests/test_project.py": "5e1f2afbc36deeafcfaad5059dfb1bea9d428bb3bfaa617c10bb78eef40d9366"
+  },
+  "behavior_tests": {
+    "tests": 37,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 15.316,
+    "platform": "darwin",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "scratch_root": "/Users/dj/Documents/server.hostinger/.local/manage-git-project-tests",
+    "remaining_test_fixtures": [],
+    "report": {
+      "path": ".local/manage-git-project-tests-result.json",
+      "sha256": "e335a1a472155f6fd5a4398e81fcda0ca678bfec9c67d574149422dee7678153"
+    },
+    "log": {
+      "path": ".local/manage-git-project-tests.log",
+      "sha256": "0dab13532bf7cdee85781f5304ed4ed8e8d494cbedc4d0750426e477f06b83c9"
+    }
+  },
+  "skill_structure_validation": {
+    "passed": true,
+    "log": ".local/manage-git-project-skill-validation.log",
+    "log_sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+  },
+  "python_version_tested": "3.9.6",
+  "real_task": {
+    "id": "manage-git-project-2026-10-19",
+    "state": ".local/manage-git-project/tasks/manage-git-project-2026-10-19.json",
+    "target": "main",
+    "remote": "origin",
+    "require_push": true,
+    "bootstrap_adoption": "Nur bereits angelegte eigene Skill-Dateien; vorher sauberer Projektstatus dokumentiert",
+    "initial_concurrency_check": "Codex-Chatliste: nur dieser Chat aktiv; kein weiterer aktiver Schreiber im Checkout",
+    "precommit_check": {
+      "passed": false,
+      "expected_blocking_conditions": [
+        "uncommitted_task_changes",
+        "integration_target_not_published"
+      ],
+      "report": ".local/manage-git-project-precommit-check.json"
+    }
+  },
+  "known_external_files_reappeared": [
+    {
+      "source": "/private/var/folders/rg/cyfcf41j3ss5w0dcm6xjw84c0000gn/T/apps_desktop_src_plugins_hermes-bots_create-agent-lazy-profile.test_After_9e01b44dd23978f9ff40b7837467f3a9f1582130.tsx",
+      "canonical_copy": ".local/recovered/2026-10-18/external-final/macos-temp/apps_desktop_src_plugins_hermes-bots_create-agent-lazy-profile.test_After_9e01b44dd23978f9ff40b7837467f3a9f1582130.tsx",
+      "sha256": "d22f3811e8d7a2b69de17a9817a56a2a4f622a9881f78ed55d0222b048408a41",
+      "bytes": 16081,
+      "open_file_check": "lsof exit 1, no output",
+      "identical_copy_removed": true
+    },
+    {
+      "source": "/private/var/folders/rg/cyfcf41j3ss5w0dcm6xjw84c0000gn/T/apps_desktop_src_plugins_hermes-bots_create-agent-lazy-profile.test_Before_b421302b1664a610d5de3c4bb7e115ec80184e04.tsx",
+      "canonical_copy": ".local/recovered/2026-10-18/external-final/macos-temp/apps_desktop_src_plugins_hermes-bots_create-agent-lazy-profile.test_Before_b421302b1664a610d5de3c4bb7e115ec80184e04.tsx",
+      "sha256": "25d69e8a94f1af986396e82f18bf72376f2b8fa7fd99305df1c3b4cb7eb905c1",
+      "bytes": 15814,
+      "open_file_check": "lsof exit 1, no output",
+      "identical_copy_removed": true
+    }
+  ]
+}

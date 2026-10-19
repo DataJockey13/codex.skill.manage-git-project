@@ -1,0 +1,173 @@
+{
+  "task": "manage-git-project-2026-10-19",
+  "outcome": "complete",
+  "reason": "",
+  "passed": false,
+  "errors": [
+    "Task changes are still uncommitted: AGENTS.md, README.md, implementation/project-audit/README.md, implementation/project-audit/validate.py, sources/decisions/log.md, sources/decisions/project-revision.md, wiki/.source-manifest.json, wiki/index.md, wiki/log.md, wiki/project-revision.md, docs/revision/2026-10-19/manage-git-project.json, docs/revision/2026-10-19/manage-git-project.md, docs/revision/2026-10-19/validation.json, implementation/agent-skills/manage-git-project/SKILL.md, implementation/agent-skills/manage-git-project/references/closure.md, implementation/agent-skills/manage-git-project/scripts/project.py, implementation/agent-skills/manage-git-project/tests/test_project.py",
+    "Current integration target is not proven published on the live remote"
+  ],
+  "retained_branches": [],
+  "resource_exceptions": {},
+  "snapshot": {
+    "project": "/Users/dj/Documents/server.hostinger",
+    "repo": "/Users/dj/Documents/server.hostinger",
+    "head": "5845717dd88dea98c0b8dfb0078c9402f7d3aaf0",
+    "branch": "main",
+    "target": "main",
+    "upstream": "origin/main",
+    "ahead": 1,
+    "behind": 0,
+    "status": {
+      "AGENTS.md": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 9517,
+          "sha256": "62c81ef8b187f8666cc0d134828149da62ac820e170df04665090fe7786f9276"
+        }
+      },
+      "README.md": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 3483,
+          "sha256": "1d7935238d57051baf3b71f66095f14f02b1e27ff121a640527dcdc2ea02dad2"
+        }
+      },
+      "implementation/project-audit/README.md": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 3380,
+          "sha256": "ddd4e366dd950af4746e89ad63f1c9f0020f4cc86129564bf4862db6ed5a8ee1"
+        }
+      },
+      "implementation/project-audit/validate.py": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 18932,
+          "sha256": "f28c86b5468433c590fcb170716f3e03cb9d8bb09677e2c9abbb711ea805d17e"
+        }
+      },
+      "sources/decisions/log.md": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 61773,
+          "sha256": "22f2f891cdd5c947ab7b58e17335ed8736cd2b3f7e25f2c8987824b98c99cab7"
+        }
+      },
+      "sources/decisions/project-revision.md": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 12864,
+          "sha256": "3effa721746b9c05b5b66c6bf04af2178eccc724a78303a5efb228fc4015b848"
+        }
+      },
+      "wiki/.source-manifest.json": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 1100415,
+          "sha256": "8bcdbb7f734b41f1edbc2d75d9edb8040224e01fe83c4971d20f71455631a209"
+        }
+      },
+      "wiki/index.md": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 7177,
+          "sha256": "898943b761b06e16658eecdac687e1fee07378bda173e081b49c1587d133eb82"
+        }
+      },
+      "wiki/log.md": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 164978,
+          "sha256": "0175ef94d306bba339525a8b360de9f15873a64d56bd1aada927f8b1477c3daf"
+        }
+      },
+      "wiki/project-revision.md": {
+        "status": " M",
+        "content": {
+          "kind": "file",
+          "bytes": 8071,
+          "sha256": "bf6a91d4dd578cc75bf5067e098525065e2f230317ddc02cbf963529729be381"
+        }
+      },
+      "docs/revision/2026-10-19/manage-git-project.json": {
+        "status": "??",
+        "content": {
+          "kind": "file",
+          "bytes": 5797,
+          "sha256": "33c22d95702d2ef855f08e18cc3207f25b49d1c24a21f906ecfcff1ec9ce843d"
+        }
+      },
+      "docs/revision/2026-10-19/manage-git-project.md": {
+        "status": "??",
+        "content": {
+          "kind": "file",
+          "bytes": 6057,
+          "sha256": "800c6a5496d129a62701bf4561fac83f2a465f30cb2495f97f4a8a4863e3c97f"
+        }
+      },
+      "docs/revision/2026-10-19/validation.json": {
+        "status": "??",
+        "content": {
+          "kind": "file",
+          "bytes": 3749,
+          "sha256": "072d1ea8131730b9c66848224c594a351367240040bf974b96b7c723452fb342"
+        }
+      },
+      "implementation/agent-skills/manage-git-project/SKILL.md": {
+        "status": "??",
+        "content": {
+          "kind": "file",
+          "bytes": 5986,
+          "sha256": "4dd363aec250372a710ed8f41d87697baa7109bbc1811765437cc58e9db2cb6c"
+        }
+      },
+      "implementation/agent-skills/manage-git-project/references/closure.md": {
+        "status": "??",
+        "content": {
+          "kind": "file",
+          "bytes": 6053,
+          "sha256": "46b07129fcf060d69f4ae95bee30f472d7c67153294b16c4fda267c80ed3b25e"
+        }
+      },
+      "implementation/agent-skills/manage-git-project/scripts/project.py": {
+        "status": "??",
+        "content": {
+          "kind": "file",
+          "bytes": 27462,
+          "sha256": "9d6075d81ca0b9dab096b5e9a0d92061d2b6d28df4d5728ecacdfd19ab0b2e54"
+        }
+      },
+      "implementation/agent-skills/manage-git-project/tests/test_project.py": {
+        "status": "??",
+        "content": {
+          "kind": "file",
+          "bytes": 21018,
+          "sha256": "5e1f2afbc36deeafcfaad5059dfb1bea9d428bb3bfaa617c10bb78eef40d9366"
+        }
+      }
+    },
+    "branches": {
+      "main": "5845717dd88dea98c0b8dfb0078c9402f7d3aaf0"
+    },
+    "worktrees": [
+      {
+        "worktree": "/Users/dj/Documents/server.hostinger",
+        "HEAD": "5845717dd88dea98c0b8dfb0078c9402f7d3aaf0",
+        "branch": "refs/heads/main"
+      }
+    ],
+    "checkout_inside_project": true
+  },
+  "receipts": [],
+  "checked_at": "2026-10-19T10:34:17.276047+00:00"
+}

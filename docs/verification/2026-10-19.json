@@ -1,0 +1,25 @@
+{
+  "tests": 37,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 14.57,
+  "platform": "darwin",
+  "git": "git version 2.50.1 (Apple Git-155)",
+  "scratch_root": "/Users/dj/Source/codex.skill.manage-git-project/.local/test-repositories",
+  "remaining_test_fixtures": [],
+  "source_sha256": {
+    "SKILL.md": "4dd363aec250372a710ed8f41d87697baa7109bbc1811765437cc58e9db2cb6c",
+    "references/closure.md": "46b07129fcf060d69f4ae95bee30f472d7c67153294b16c4fda267c80ed3b25e",
+    "scripts/project.py": "9d6075d81ca0b9dab096b5e9a0d92061d2b6d28df4d5728ecacdfd19ab0b2e54",
+    "tests/test_project.py": "5e1f2afbc36deeafcfaad5059dfb1bea9d428bb3bfaa617c10bb78eef40d9366"
+  },
+  "structure_validation": {
+    "passed": true,
+    "python_used": "/Users/dj/Documents/server.hostinger/implementation/ariadne/app/.venv/bin/python",
+    "note": "Existing interpreter with PyYAML used as validation tool; runtime and behavior tests require only Python standard library and Git"
+  },
+  "date": "2026-10-19",
+  "test_log_sha256": "90b85c506ca8582d35ab6e3e587434dcb4ae806dc684d14f0e9a8f352e3715ab",
+  "native_windows_tested": false
+}

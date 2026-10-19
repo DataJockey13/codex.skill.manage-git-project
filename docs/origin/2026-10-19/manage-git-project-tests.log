@@ -1,0 +1,53 @@
+test_accidental_commit_of_user_change_blocks_closure (__main__.Lifecycle) ... ok
+test_atomic_cleanup_refuses_if_integration_target_moves_back (__main__.Lifecycle) ... ok
+test_bootstrap_adoption_requires_reason (__main__.Lifecycle) ... ok
+test_branch_configuration_is_removed_with_integrated_branch (__main__.Lifecycle) ... ok
+test_cannot_overwrite_finished_task_history (__main__.Lifecycle) ... ok
+test_changed_migration_content_is_detected (__main__.Lifecycle) ... ok
+test_clean_worktree_is_removed_before_branch (__main__.Lifecycle) ... ok
+test_compare_and_delete_does_not_remove_a_changed_branch_tip (__main__.Lifecycle) ... ok
+test_dangling_retained_symlink_blocks_closure (__main__.Lifecycle) ... ok
+test_discard_and_integration_evidence_cannot_be_mixed (__main__.Lifecycle) ... ok
+test_discard_does_not_bypass_unique_ignored_worktree_files (__main__.Lifecycle) ... ok
+test_external_user_configuration_requires_specific_reason (__main__.Lifecycle) ... ok
+test_ignored_file_is_not_discarded_even_when_git_status_is_clean (__main__.Lifecycle) ... ok
+test_inspect_is_read_only_and_handles_spaces (__main__.Lifecycle) ... ok
+test_known_temporary_file_blocks_until_removed (__main__.Lifecycle) ... ok
+test_live_remote_recreation_is_not_hidden_by_stale_tracking_refs (__main__.Lifecycle) ... ok
+test_locked_worktree_is_preserved (__main__.Lifecycle) ... ok
+test_missing_ignore_is_not_silently_written (__main__.Lifecycle) ... ok
+test_open_work_is_handoff_not_completed (__main__.Lifecycle) ... ok
+test_preexisting_change_is_preserved_without_blanket_clean (__main__.Lifecycle) ... ok
+test_real_process_using_worktree_prevents_removal (__main__.Lifecycle) ... ok
+test_regular_merge_cleanup_preserves_commit_history (__main__.Lifecycle) ... ok
+test_remote_branch_blocks_local_cleanup_until_target_published_and_remote_removed (__main__.Lifecycle) ... ok
+test_remote_outage_does_not_become_a_successful_closure (__main__.Lifecycle) ... ok
+test_squash_requires_exact_integration_commit (__main__.Lifecycle) ... ok
+test_state_cannot_escape_through_symlink (__main__.Lifecycle) ... ok
+test_symlink_to_outside_is_not_a_canonical_deliverable (__main__.Lifecycle) ... ok
+test_target_and_foreign_branch_are_protected (__main__.Lifecycle) ... ok
+test_target_is_project_specific_not_hardcoded_main (__main__.Lifecycle) ... ok
+test_task_locks_conflicting_writer_until_finish (__main__.Lifecycle) ... ok
+test_temp_and_external_artifact_must_be_accounted_for (__main__.Lifecycle) ... ok
+test_uncommitted_task_output_blocks_completion (__main__.Lifecycle) ... ok
+test_unique_unmerged_commits_are_not_removed (__main__.Lifecycle) ... ok
+test_unregistered_new_branch_is_detected (__main__.Lifecycle) ... ok
+test_unrelated_integration_commit_cannot_discard_unique_patch (__main__.Lifecycle) ... ok
+test_user_discard_is_recorded_without_merging_rejected_experiment (__main__.Lifecycle) ... ok
+test_worktree_with_untracked_file_is_preserved (__main__.Lifecycle) ... ok
+
+----------------------------------------------------------------------
+Ran 37 tests in 15.316s
+
+OK
+{
+  "tests": 37,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 15.316,
+  "platform": "darwin",
+  "git": "git version 2.50.1 (Apple Git-155)",
+  "scratch_root": "/Users/dj/Documents/server.hostinger/.local/manage-git-project-tests",
+  "remaining_test_fixtures": []
+}
