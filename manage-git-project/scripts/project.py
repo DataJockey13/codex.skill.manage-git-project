@@ -334,6 +334,8 @@ def remove_worktree(args):
     candidate = absolute(project, args.path).resolve()
     require(candidate != project and candidate != repo and contained(project, candidate), "Protected/outside checkout")
     require(args.idle_evidence.strip(), "Verify active agents/processes and provide concrete idle evidence")
+    candidate_lock = lock_path(path.parent.parent, candidate)
+    require(not candidate_lock.exists(), "Worktree is reserved by an active cooperative task")
     records = [x for x in worktrees(repo) if Path(x["worktree"]).resolve() == candidate]
     require(len(records) == 1 and "branch" in records[0], "Worktree must be registered with a task branch")
     item = records[0]
@@ -348,7 +350,17 @@ def remove_worktree(args):
             active = subprocess.run(["lsof", "-nP", "+D", str(candidate)], capture_output=True, timeout=15)
         except subprocess.TimeoutExpired:
             raise Refused("Process inspection timed out; worktree was preserved")
-        require(active.returncode == 1 and not active.stdout, "Open files/processes remain or process check failed")
+        require(active.returncode == 1 and not active.stdout and not active.stderr,
+                "Open files/processes remain or process check failed")
+    # Process inspection can take seconds. Revalidate ownership, refs and files
+    # afterwards; Git's own removal check does not protect ignored files.
+    require(not candidate_lock.exists(), "Worktree is reserved by an active cooperative task")
+    current = [x for x in worktrees(repo) if Path(x["worktree"]).resolve() == candidate]
+    require(current == records and oid(repo, "refs/heads/" + name) == commit
+            and oid(repo, "refs/heads/" + data["target"]) == target,
+            "Worktree or integration refs changed during activity inspection; inspect again")
+    require(not status(candidate), "Tracked or untracked worktree changes appeared during activity inspection")
+    require(not worktree_payload(candidate), "Ignored files appeared during activity inspection; preserve them first")
     git(repo, "worktree", "remove", "--", str(candidate))
     receipt = {"action": "remove-worktree", "path": str(candidate), "branch": name,
                "oid": commit, "target_oid": target, "integration_evidence": evidence,
@@ -435,9 +447,18 @@ def check(args):
         reason = item["retained_reason"]
         if reason:
             retained.append({"branch": name, "reason": reason})
+            if name not in snapshot["branches"]:
+                errors.append(f"Retained task branch is missing: {name}")
             if args.outcome == "complete":
                 errors.append(f"Task branch is retained; use documented handoff: {name}")
             continue
+        for location in item["worktrees"]:
+            candidate = Path(location)
+            if candidate == repo:
+                continue
+            registered = any(Path(x["worktree"]) == candidate for x in snapshot["worktrees"])
+            if registered or candidate.exists() or candidate.is_symlink():
+                errors.append(f"Task worktree remains, including detached or unregistered files: {location}")
         if name in snapshot["branches"]:
             errors.append(f"Task branch remains: {name}")
         receipts = [x for x in data["receipts"] if x["action"] == "remove-branch" and x["branch"] == name]
@@ -452,6 +473,10 @@ def check(args):
             integrated_oid = proof.get("integration_commit", receipt["oid"])
             if not ancestor(repo, integrated_oid, "refs/heads/" + data["target"]):
                 errors.append(f"Previously removed branch tip no longer reachable: {name}")
+            if live is not None:
+                published_target = live.get("refs/heads/" + data["target"])
+                if not published_target or not ancestor(repo, integrated_oid, published_target):
+                    errors.append(f"Previously removed branch integration is no longer on the live remote target: {name}")
         if live is not None and "refs/heads/" + name in live:
             errors.append(f"Remote task branch remains: {name}")
     for item in snapshot["worktrees"]:

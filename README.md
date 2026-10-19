@@ -5,6 +5,9 @@ Eigenständiges Entwicklungsprojekt für den Codex-Skill
 Der Skill unterstützt kanonische Projektablage, aufgabenbezogene Git-Inventare,
 Integration, geschützte Bereinigung und überprüften Aufgabenabschluss.
 
+Version 1.0 ist als [Release v1.0.0](https://github.com/DataJockey13/codex.skill.manage-git-project/releases/tag/v1.0.0)
+mit einem ZIP des Skill-Ordners und SHA-256-Prüfsumme verfügbar.
+
 ## Einstieg
 
 - [Startprompt für einen neuen Projektchat](PROMPT.md)
@@ -21,7 +24,8 @@ Die benutzerweite Installation
 `manage-git-project/` dieses Repositories. Die benutzerweite Pflicht zur Nutzung
 in `/Users/dj/.codex/AGENTS.md` bleibt erhalten. Der frühere Quellbestand unter
 `server.hostinger/implementation/agent-skills/` entfällt nach geprüftem Umzug.
-Das Repository wird zunächst lokal auf `main` geführt; es gibt kein Remote.
+Das Repository wird auf `main` geführt. Das öffentliche Remote `origin` ist
+[`DataJockey13/codex.skill.manage-git-project`](https://github.com/DataJockey13/codex.skill.manage-git-project).
 
 ## Prüfen
 
@@ -42,15 +46,19 @@ mit einem Python-Interpreter möglich, in dem PyYAML verfügbar ist:
 python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py manage-git-project
 ```
 
-Der aktuelle datierte [Prüfnachweis](docs/verification/2026-10-19.json) bindet
-die ausgeführten Tests an die Quellhashes. Die Installation eines zusätzlichen
+Der aktuelle [Prüfnachweis für v1.0.0](docs/verification/2026-10-19-v1.0.0.json)
+bindet die ausgeführten Tests an die Quellhashes. Der
+[Abschlussaudit](docs/closure-audit-v1.0.0.md) beschreibt die belegten Fehler und
+Korrekturen. Die Installation eines zusätzlichen
 Pakets ist für Skill-Skript und Verhaltenstests nicht erforderlich.
 
 ## Herkunft
 
-Der unverändert übernommene Skill stammt aus Commit
+Der ursprünglich unverändert übernommene Skill stammt aus Commit
 `d8c92618c409f4bbb924539f4fde6f44bfccde3a` des früheren Projekts
 `/Users/dj/Documents/server.hostinger`.
+Der [Importprüfnachweis](docs/verification/2026-10-19.json) dokumentiert den
+damaligen Stand vor der Weiterentwicklung in diesem Repository.
 Unter `docs/origin/2026-10-19/` liegen die unverändert kopierten
 Einführungsberichte, damaligen Testlogs und der historische Projektprüfbericht.
 Ihre Pfade, Links und Statusangaben beschreiben den damaligen Projektkontext;

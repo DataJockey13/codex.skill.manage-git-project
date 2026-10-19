@@ -29,6 +29,7 @@
   Belege und werden nicht nachträglich an neue Pfade oder Ergebnisse angepasst.
 - Committe nach erfolgreicher Prüfung nur aufgabenbezogene Änderungen und
   integriere abgeschlossene eigene Zweige in `main`. Bereinige erledigte eigene
-  Zweige und Arbeitskopien gemäß Skill. Es ist derzeit kein Remote eingerichtet;
-  lokale Commits genügen. Ein GitHub-Repository erst auf ausdrücklichen Auftrag
-  anlegen. Wenn später ein Remote vereinbart wird, gelten dessen Projektregeln.
+  Zweige und Arbeitskopien gemäß Skill. Das öffentliche Remote `origin` ist
+  `https://github.com/DataJockey13/codex.skill.manage-git-project`.
+  Pushe geprüfte abgeschlossene Änderungen auf `origin/main`. Tags und Releases
+  werden bei entsprechendem Auftrag veröffentlicht.

@@ -440,6 +440,137 @@ class Lifecycle(unittest.TestCase):
                  "Synthetic user rejected the committed experiment", expect=2)
         self.assertTrue(file.exists())
 
+    def test_detaching_owned_worktree_does_not_allow_complete_closure(self):
+        self.begin()
+        directory = self.branch(worktree=True)
+        self.merge()
+        self.git("switch", "--detach", repo=directory)
+        (directory / "ignored").mkdir()
+        private = directory / "ignored/private.txt"
+        private.write_text("unique unfinished work")
+        self.cli("remove-branch", "--branch", "codex/change")
+        self.cli("finish", expect=2)
+        self.assertEqual(private.read_text(), "unique unfinished work")
+        state = json.loads((self.repo / ".local/manage-git-project/tasks/fixture.json").read_text())
+        self.assertEqual(state["state"], "active")
+
+    def test_pruning_registration_does_not_hide_owned_worktree_files(self):
+        self.begin()
+        directory = self.branch(worktree=True)
+        self.merge()
+        private = directory / "private.txt"
+        private.write_text("unregistered but still needed")
+        (directory / ".git").unlink()
+        self.git("worktree", "prune", "--expire", "now")
+        self.cli("remove-branch", "--branch", "codex/change")
+        self.cli("check", expect=1)
+        self.assertEqual(private.read_text(), "unregistered but still needed")
+
+    def test_missing_retained_branch_cannot_be_reported_as_handoff(self):
+        self.begin()
+        self.branch()
+        self.cli("retain", "--branch", "codex/change", "--reason", "Review is pending")
+        self.git("switch", "main")
+        self.git("branch", "-D", "codex/change")
+        self.cli("finish", "--outcome", "handoff", "--reason", "Await review", expect=2)
+
+    def test_active_worktree_task_prevents_removal_after_its_cli_exits(self):
+        self.begin()
+        directory = self.branch(worktree=True)
+        self.merge()
+        with contextlib.redirect_stdout(io.StringIO()):
+            code = project.main(["--project-root", str(self.repo), "--repo", str(directory),
+                                 "--task", "other-author", "begin", "--target", "main"])
+        self.assertEqual(code, 0)
+        self.cli("remove-worktree", "--path", str(directory), "--idle-evidence",
+                 "No running CLI; cooperative task is still active", expect=2)
+        self.assertTrue(directory.exists())
+
+    @unittest.skipUnless(shutil.which("lsof"), "Real process inspection requires lsof")
+    def test_ignored_file_created_during_process_check_is_preserved(self):
+        self.begin()
+        directory = self.branch(worktree=True)
+        self.merge()
+        private = directory / "ignored/private.txt"
+        original_run = subprocess.run
+
+        def late_file(command, *args, **kwargs):
+            result = original_run(command, *args, **kwargs)
+            if command[0] == "lsof":
+                private.parent.mkdir()
+                private.write_text("created while lsof was checking")
+            return result
+
+        with mock.patch.object(project.subprocess, "run", side_effect=late_file):
+            self.cli("remove-worktree", "--path", str(directory), "--idle-evidence",
+                     "Actual process check with a concurrent file writer", expect=2)
+        self.assertEqual(private.read_text(), "created while lsof was checking")
+
+    def test_incomplete_process_scan_does_not_allow_worktree_removal(self):
+        self.begin()
+        directory = self.branch(worktree=True)
+        self.merge()
+        original_run = subprocess.run
+
+        def incomplete_scan(command, *args, **kwargs):
+            if command[0] == "lsof":
+                return subprocess.CompletedProcess(command, 1, b"", b"WARNING: cannot stat; output may be incomplete")
+            return original_run(command, *args, **kwargs)
+
+        with mock.patch.object(project.shutil, "which", return_value="lsof"), \
+                mock.patch.object(project.subprocess, "run", side_effect=incomplete_scan):
+            self.cli("remove-worktree", "--path", str(directory), "--idle-evidence",
+                     "Host process inspection reported an incomplete scan", expect=2)
+        self.assertTrue(directory.exists())
+
+    @unittest.skipUnless(shutil.which("lsof"), "Real process inspection requires lsof")
+    def test_worktree_branch_switch_during_process_check_prevents_removal(self):
+        self.begin()
+        directory = self.branch(worktree=True)
+        self.merge()
+        original_run = subprocess.run
+
+        def late_switch(command, *args, **kwargs):
+            result = original_run(command, *args, **kwargs)
+            if command[0] == "lsof":
+                self.git("switch", "-c", "foreign-author", repo=directory)
+            return result
+
+        with mock.patch.object(project.subprocess, "run", side_effect=late_switch):
+            self.cli("remove-worktree", "--path", str(directory), "--idle-evidence",
+                     "Actual process check with a concurrent branch switch", expect=2)
+        self.assertEqual(self.git("branch", "--show-current", repo=directory), "foreign-author")
+
+    @unittest.skipUnless(shutil.which("lsof"), "Real process inspection requires lsof")
+    def test_new_commit_during_process_check_prevents_worktree_removal(self):
+        self.begin()
+        directory = self.branch(worktree=True)
+        self.merge()
+        original_run = subprocess.run
+
+        def late_commit(command, *args, **kwargs):
+            result = original_run(command, *args, **kwargs)
+            if command[0] == "lsof":
+                (directory / "feature.txt").write_text("new unmerged work")
+                self.git("commit", "-am", "additional work", repo=directory)
+            return result
+
+        with mock.patch.object(project.subprocess, "run", side_effect=late_commit):
+            self.cli("remove-worktree", "--path", str(directory), "--idle-evidence",
+                     "Actual process check with a concurrent commit", expect=2)
+        self.assertEqual((directory / "feature.txt").read_text(), "new unmerged work")
+
+    def test_remote_target_rollback_invalidates_cleanup_receipt_without_require_push(self):
+        remote = self.remote()
+        baseline = self.git("rev-parse", "main")
+        self.begin("--remote", "origin")
+        self.branch()
+        self.merge()
+        self.git("push", "origin", "main")
+        self.cli("remove-branch", "--branch", "codex/change")
+        self.git("update-ref", "refs/heads/main", baseline, repo=remote)
+        self.cli("check", expect=1)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

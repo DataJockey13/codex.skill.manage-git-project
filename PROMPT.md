@@ -9,9 +9,10 @@ manage-git-project/SKILL.md und bei Bedarf references/closure.md im Skill.
 Prüfe Git-Status, Branch, Arbeitskopien und andere aktive Schreiber.
 Nutze den Skill selbst vor Dateiänderungen und für den Aufgabenabschluss.
 
-Der aktuelle Skill mit scripts/project.py und tests/test_project.py wurde
-unverändert aus dem Projekt server.hostinger übernommen. Herkunft, Hashes und
-Prüfergebnisse stehen unter docs/. Historische Berichte unter docs/origin/
+Der Skill mit scripts/project.py und tests/test_project.py wurde ursprünglich
+unverändert aus dem Projekt server.hostinger übernommen und wird hier
+weiterentwickelt. Herkunft, Hashes und Prüfergebnisse stehen unter docs/.
+Historische Berichte unter docs/origin/
 enthalten die damals geltenden Pfade; sie sind keine aktuelle Konfiguration.
 Die benutzerweite Installation ~/.agents/skills/manage-git-project zeigt auf
 den Unterordner manage-git-project dieses neuen Projekts.
@@ -34,8 +35,9 @@ Arbeite anhand konkreter Anforderungen oder nachgewiesener Fehler. Halte
 SKILL.md knapp, verlagere bedingte Details in references/ und prüfe Änderungen
 an den Skripten mit beobachtbaren Verhaltenstests an echten lokalen Git-Repos.
 Committe geprüfte Änderungen auf main beziehungsweise integriere fertige eigene
-Aufgabenbranches und bereinige sie. Es gibt zunächst kein Remote; richte GitHub
-nicht ohne ausdrücklichen Auftrag ein.
+Aufgabenbranches und bereinige sie. Das öffentliche Remote origin ist
+https://github.com/DataJockey13/codex.skill.manage-git-project.
+Pushe geprüfte abgeschlossene Änderungen auf origin/main.
 
 Beginne mit einer lesenden Bestandsaufnahme: Erkläre kurz den aktuellen Aufbau,
 die vorhandenen Prüfungen und belegte Grenzen. Erfinde keinen nächsten

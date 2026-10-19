@@ -49,6 +49,14 @@ ignorierte Dateien und eine konkrete Prüfung aktiver Prozesse/Agenten.
 Wenn verfügbar, wird `lsof` zusätzlich verwendet; ein Fehler oder Zeitlimit
 führt zum Erhalt des Worktrees. Ohne `lsof` muss die Aktivitätsprüfung über
 geeignete Host-Werkzeuge erfolgen. Ein bloß erfundener Leerlaufbeleg genügt nicht.
+Auch ein aktiver kooperativer Aufgabenlock im gemeinsamen Statusverzeichnis
+blockiert die Entfernung, selbst wenn dessen CLI-Prozess längst beendet ist.
+
+Nach der Prozessprüfung werden Registrierung, Branchspitze, Integrationsziel,
+Aufgabenlock und Dateibestand erneut geprüft. Auch `lsof`-Warnungen über einen
+unvollständigen Scan blockieren die Entfernung. Die Prüfungen bilden keine
+atomare Betriebssystemsperre: nicht kooperierende Schreiber müssen vor dem
+Bereinigen angehalten beziehungsweise koordiniert werden.
 
 Auch ein sauberer Git-Status erlaubt keine Entfernung ignorierter Daten.
 Einzigartige Dateien zuerst vollständig ins Projekt überführen; bekannte
@@ -92,6 +100,14 @@ Ausgangsänderungen, erledigte deklarierte Artefakte und Löschbelege für eigen
 Zweige. Unregistrierte neue Branches/Worktrees und wieder angelegte Remote-Zweige
 werden sichtbar. Mit `--require-push` beim Start wird auch die Veröffentlichung
 des aktuellen Integrationsstands verlangt.
+Auch ohne `--require-push` müssen die Integrationscommits bereits entfernter
+Aufgabenbranches weiterhin auf dem ausgewählten Live-Remote-Ziel erreichbar
+sein. Ein zwischenzeitlicher Remote-Rücksprung entwertet den Abschlussbeleg.
+
+Eigene zusätzliche Worktree-Pfade müssen beim vollständigen Abschluss sowohl
+aus der Registrierung als auch vom Dateisystem verschwunden sein. Ein Wechsel
+auf detached HEAD oder eine entfernte Registrierung genügt nicht. Begründet
+behaltene Arbeit erfordert eine Übergabe; ihr Aufgabenbranch muss noch existieren.
 
 Für tatsächlich offene Arbeit `retain --branch <Name> --reason <KonkreterGrund>`
 und anschließend `finish --outcome handoff --reason <Übergabegrund>` verwenden.

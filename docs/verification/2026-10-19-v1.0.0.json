@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-19",
+  "release": "v1.0.0",
+  "base_commit": "0d5e2d269561e7e0b34e9e75f8497625a8d140d1",
+  "before_fixes": {
+    "tests": 45,
+    "failures": 8,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 18.191,
+    "platform": "darwin",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "scratch_root": ".local/test-repositories-closure-v1",
+    "remaining_test_fixtures": []
+  },
+  "before_script_sha256": "9d6075d81ca0b9dab096b5e9a0d92061d2b6d28df4d5728ecacdfd19ab0b2e54",
+  "additional_process_scan_regression_before_fix": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0
+  },
+  "final_result": {
+    "tests": 46,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 17.81,
+    "platform": "darwin",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "scratch_root": ".local/test-repositories-closure-v1",
+    "remaining_test_fixtures": []
+  },
+  "source_sha256": {
+    "SKILL.md": "4dd363aec250372a710ed8f41d87697baa7109bbc1811765437cc58e9db2cb6c",
+    "references/closure.md": "1952e33f2b6c4453061fa9d6935eac2c2579d21dda464107ceb98b7dc5faeda2",
+    "scripts/project.py": "b03d115d0584aabdd551c3fbe5e562aea4b3401ae0ca0a27582a6cce0bac5bd5",
+    "tests/test_project.py": "954a9ef6993eec200f271e0ecf8901af699c54c59dd1fdc19dc44e8b1365aa88"
+  },
+  "log_sha256": {
+    "before.log": "b0e4d2fb289fc6c96fc712aeb1520655c2472599ee9f0a2d53938e2523485142",
+    "process-scan-before.log": "235dc4617bf037e890f084a529e3410c1902d436bc68a893555607f773ca63a1",
+    "final.log": "5461d4576f18f0f0b039ae39c967bd0f6862d5bbe3a6193d90457d70132055c2",
+    "structure.log": "c1eac1fd05efa66d95fbba7d081c3345cd8bda921fb28b830957dd7e5a5110dc"
+  },
+  "structure_validation": {
+    "passed": true,
+    "tool": "skill-creator/scripts/quick_validate.py",
+    "dependency": "PyYAML, supplied in a project-local uv cache"
+  },
+  "historical_import_evidence_unchanged": true,
+  "native_windows_tested": false,
+  "native_linux_tested": false,
+  "notes": [
+    "Behavior tests use real local Git repositories and bare remotes; concurrent events are injected at subprocess boundaries.",
+    "No GitHub writes occur in the behavior tests.",
+    "The cooperative locks and repeated inventories are not an atomic operating-system write barrier."
+  ]
+}
