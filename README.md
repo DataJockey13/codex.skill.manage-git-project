@@ -11,11 +11,11 @@ Projekt; `main` ist das übliche Beispiel, keine feste Vorgabe.
 
 [Skill-Anleitung](manage-git-project/SKILL.md)
 · [Automatischer Ablauf](manage-git-project/references/automation.md)
-· [Veröffentlichte Version 1.0](https://github.com/DataJockey13/codex.skill.manage-git-project/releases/tag/v1.0.0)
+· [Version 1.1 herunterladen](https://github.com/DataJockey13/codex.skill.manage-git-project/releases/tag/v1.1.0)
 
 ## Einmal einrichten
 
-### 1. Aktuellen Skill installieren
+### 1. Version 1.1 installieren
 
 Gib Codex diesen Auftrag:
 
@@ -23,18 +23,25 @@ Gib Codex diesen Auftrag:
 Nutze $skill-installer und installiere manage-git-project aus
 https://github.com/DataJockey13/codex.skill.manage-git-project
 Unterordner: manage-git-project
-Version/Ref: main
+Version/Ref: v1.1.0
 ```
 
-**Die hier beschriebene Automatik liegt auf `main`.** Das bestehende Release
-`v1.0.0` enthält den früheren manuellen Ablauf. Eine darauf festgelegte
-Installation musst du auf den aktuellen Stand aktualisieren. Prüfe eine
-vorhandene Installation, bevor du sie ersetzt.
+**Version 1.1 enthält die automatische Aufgabenisolation, Integration und
+Bereinigung.** Der feste Ref `v1.1.0` installiert genau diesen veröffentlichten
+Stand. Wenn du noch `v1.0.0` verwendest, beauftrage Codex mit dem Update auf
+`v1.1.0`. Lass dabei die vorhandene Installation und mögliche eigene Anpassungen
+prüfen, bevor sie ersetzt wird. Die einmalige Projekteinstellung unten gilt
+auch nach dem Update.
 
 Installiert wird der Unterordner mit der `SKILL.md`. Falls der Skill anschließend
-nicht angezeigt wird, starte Codex neu. Alternativ kannst du diesen Unterordner
-manuell nach `~/.agents/skills/manage-git-project` kopieren. Hinweise zur
-Skill-Erkennung findest du in der
+nicht angezeigt wird, starte Codex neu.
+
+Für die manuelle Installation lade das
+[Skill-ZIP](https://github.com/DataJockey13/codex.skill.manage-git-project/releases/download/v1.1.0/manage-git-project-v1.1.0.zip)
+und die zugehörige
+[SHA-256-Datei](https://github.com/DataJockey13/codex.skill.manage-git-project/releases/download/v1.1.0/manage-git-project-v1.1.0.zip.sha256).
+Prüfe die Prüfsumme, entpacke das ZIP und kopiere den Ordner `manage-git-project` nach
+`~/.agents/skills/`. Hinweise zur Skill-Erkennung findest du in der
 [OpenAI-Dokumentation](https://learn.chatgpt.com/docs/build-skills).
 
 ### 2. Automatische Verwendung festlegen
@@ -117,6 +124,9 @@ Alle **75 Verhaltenstests** bestehen auf macOS/arm64. Die aktuelle Automatik
 wurde zusätzlich mit zwei parallelen Agenten-Chats in zwei aufeinanderfolgenden
 Runden in einem isolierten Testprojekt geprüft. Details und Ergebnisse stehen im
 [Automatik-Prüfnachweis](docs/automatic-worktrees.md).
+Das veröffentlichte Paket von Version 1.1 wird zusätzlich in einer isolierten
+Python-Umgebung einschließlich automatischem Aufgabenabschluss geprüft;
+Details stehen im [Release-Prüfnachweis](docs/release-v1.1.0.md).
 
 Die frühere öffentliche Installation von `v1.0.0` wurde separat auf macOS/arm64
 geprüft; die damaligen 46 Tests und der vollständige Installationsablauf sind im

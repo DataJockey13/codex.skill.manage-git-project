@@ -1,0 +1,57 @@
+{
+  "release": "v1.1.0",
+  "checked_at": "2026-10-20T11:09:11.400824+00:00",
+  "runtime": {
+    "python": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "packages": []
+  },
+  "source_sha256": {
+    "SKILL.md": "131c745c3bce6c641aae59386b13048b091ea0913cb63767c63f532ae9f75660",
+    "references/automation.md": "c232e6b9bf3c689c863bb266c656243627ab657b7823bff321624a4e2df99c64",
+    "references/closure.md": "0e034858f57c74f8b33af7b4e19850068a2a597c0f72ecc18b614e574443c433",
+    "scripts/automation.py": "5879a1386a839b3e3ffec9265972fed54d60e025322ff674a4cc7ea99a6542a6",
+    "scripts/project.py": "6a76b6ce21cce87dbd907900acc424254f56cf53f3667208f7eba057b2de3bbe",
+    "tests/test_project.py": "5064ec57f85212f4485c03bc5fb33750751f1e96fa233ac1902681626903f55c"
+  },
+  "archive_sha256": "aa178a9ac8fcbbff637349f5ee650c631a31fab244b97e385e8baa9c4659dfa1",
+  "archive_size_bytes": 33692,
+  "archive_contents_match_source": true,
+  "behavior_tests": {
+    "tests": 75,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 82.651,
+    "platform": "darwin",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "scratch_root": ".local/release-v1.1.0-test/behavior-repos",
+    "remaining_test_fixtures": []
+  },
+  "automatic_workflow": {
+    "passed": true,
+    "two_isolated_workers": true,
+    "pending_while_target_reserved": true,
+    "worker_and_combined_validation": true,
+    "local_bare_remote_matches": true,
+    "canonical_artifact_mapping": true,
+    "final_branches": [
+      "main"
+    ],
+    "final_worktree_count": 1,
+    "remaining_checkout_locks": [],
+    "remaining_task_worktrees": [],
+    "combined_tests": 3,
+    "main": "8a60f93405d39ca3728199335c0dee69f9ab91f5"
+  },
+  "limits": [
+    "Native macOS/arm64 only; no Windows/Linux run.",
+    "Isolated directories, environment variables and Python venv; no container or OS sandbox.",
+    "Package tested before publication; public tagged installation checked separately after publication."
+  ],
+  "isolated_environment_removed": true,
+  "source_base_commit": "e607960e2ad27bca8ef69089c56c82a0fe115e2a",
+  "package_filename": "manage-git-project-v1.1.0.zip",
+  "checksum_filename": "manage-git-project-v1.1.0.zip.sha256",
+  "package_validation_harness_sha256": "6ff39d0fdd5b7e1d79e7ccc3333169def0695219f91eaf3c643246575768e3df"
+}

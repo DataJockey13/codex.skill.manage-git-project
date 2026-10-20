@@ -87,4 +87,4 @@ Ein belegter oder schmutziger fremder Zielcheckout, benötigte Freigaben und
 unbekannte Daten werden nicht übergangen. Der Zielbranch benötigt einen
 verfügbaren projektinternen Checkout. Projekte mit verbindlicher PR-/Squash-
 Integration verwenden dafür ihren vorgeschriebenen Ablauf. Die veröffentlichte
-Version `v1.0.0` bleibt unverändert; diese Automatik wird über `main` installiert.
+Version `v1.0.0` bleibt unverändert; diese Automatik ist ab [Version 1.1](release-v1.1.0.md) verfügbar.
