@@ -1,0 +1,315 @@
+{
+  "verified_at": "2026-10-20T10:14:27.220637+00:00",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "python": "3.9.6",
+  "git": "git version 2.50.1 (Apple Git-155)",
+  "source_sha256": {
+    "README.md": "596d3494ea53d62d344cfe7fe0d22a35b09111dddbd15b5ab49bb80139a1f814",
+    "manage-git-project/SKILL.md": "131c745c3bce6c641aae59386b13048b091ea0913cb63767c63f532ae9f75660",
+    "manage-git-project/references/automation.md": "c232e6b9bf3c689c863bb266c656243627ab657b7823bff321624a4e2df99c64",
+    "manage-git-project/references/closure.md": "0e034858f57c74f8b33af7b4e19850068a2a597c0f72ecc18b614e574443c433",
+    "manage-git-project/scripts/automation.py": "5879a1386a839b3e3ffec9265972fed54d60e025322ff674a4cc7ea99a6542a6",
+    "manage-git-project/scripts/project.py": "6a76b6ce21cce87dbd907900acc424254f56cf53f3667208f7eba057b2de3bbe",
+    "manage-git-project/tests/test_project.py": "5064ec57f85212f4485c03bc5fb33750751f1e96fa233ac1902681626903f55c"
+  },
+  "behavior_tests": {
+    "tests": 75,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 65.44,
+    "platform": "darwin",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "scratch_root": "/Users/dj/Source/codex.skill.manage-git-project/.local/automatic-worktrees-tests",
+    "remaining_test_fixtures": []
+  },
+  "skill_validation": "Skill is valid!",
+  "parallel_agent_chats": {
+    "surface": "two independent collaboration subagent chat contexts; two consecutive rounds",
+    "desktop_ui_threads_tested": false,
+    "rounds": [
+      {
+        "observed_at": "2026-10-20T10:07:22.751993+00:00",
+        "simultaneously_active": true,
+        "overlapping_task_intervals": true,
+        "tasks": [
+          "parallel-alpha-20261020-1206",
+          "parallel-beta-20261020-01"
+        ],
+        "distinct_workspaces": true,
+        "all_isolated": true
+      },
+      {
+        "observed_at": "2026-10-20T10:12:21.687203+00:00",
+        "simultaneously_active": true,
+        "overlapping_task_intervals": true,
+        "tasks": [
+          "parallel-beta-wordcount-20261020-01",
+          "parallel-alpha-words-20261020-a1"
+        ],
+        "distinct_workspaces": true,
+        "all_isolated": true
+      }
+    ],
+    "tasks": [
+      {
+        "task": "parallel-beta-20261020-01",
+        "started_at": "2026-10-20T10:06:57.845435+00:00",
+        "finished_at": "2026-10-20T10:07:41.605006+00:00",
+        "workspace": ".local/worktrees/parallel-beta-20261020-01",
+        "mode": "worktree",
+        "collision_reasons": [
+          "checkout reserved by another task",
+          "other project tasks are active",
+          "Agentenprüfung: /root/parallel_alpha bearbeitet parallel dasselbe Projekt; eigener isolierter Checkout erforderlich"
+        ],
+        "source_oid": "6478c6459399330686af1b0770e8e475496c8c8e",
+        "target_base": "14a7c1dabcbcae41fbd0f9351118c1b5fb06fb57",
+        "integration_commit": "021e5c0c1fea29a545ebd342de51df88f2850cd3",
+        "validation": [
+          {
+            "command": [
+              "python3",
+              "-B",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "tests"
+            ],
+            "commit": "6478c6459399330686af1b0770e8e475496c8c8e",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "dcd2147edfda2291b456dfb6d9f3021f0fed07760d5a1c8869fc5446f30e28fe",
+            "at": "2026-10-20T10:07:40.244604+00:00",
+            "action": "source-validation"
+          },
+          {
+            "command": [
+              "python3",
+              "-B",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "tests"
+            ],
+            "commit": "021e5c0c1fea29a545ebd342de51df88f2850cd3",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "dcd2147edfda2291b456dfb6d9f3021f0fed07760d5a1c8869fc5446f30e28fe",
+            "at": "2026-10-20T10:07:40.399180+00:00",
+            "action": "integration-validation",
+            "source_oid": "6478c6459399330686af1b0770e8e475496c8c8e",
+            "target_base": "14a7c1dabcbcae41fbd0f9351118c1b5fb06fb57"
+          }
+        ],
+        "cleanup_actions": [
+          "remove-integration-worktree",
+          "remove-worktree",
+          "remove-branch"
+        ],
+        "complete": true,
+        "closure_passed": true
+      },
+      {
+        "task": "parallel-alpha-20261020-1206",
+        "started_at": "2026-10-20T10:06:59.760322+00:00",
+        "finished_at": "2026-10-20T10:07:51.423048+00:00",
+        "workspace": ".local/worktrees/parallel-alpha-20261020-1206",
+        "mode": "worktree",
+        "collision_reasons": [
+          "checkout reserved by another task",
+          "other project tasks are active",
+          "Aktiver Peer-Agent /root/parallel_beta bearbeitet dasselbe Projekt; getrennte Arbeitskopie erforderlich."
+        ],
+        "source_oid": "bf3dbf09f431c7763e955b0209e770cae2bde9db",
+        "target_base": "021e5c0c1fea29a545ebd342de51df88f2850cd3",
+        "integration_commit": "117163fce64d021fef6e8e387ed47b0a18419599",
+        "validation": [
+          {
+            "command": [
+              "python3",
+              "-B",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "tests"
+            ],
+            "commit": "bf3dbf09f431c7763e955b0209e770cae2bde9db",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "888a0c0ed615e57d32cf72be501b0c355f33b8613c81dfdaa99db33d7959487e",
+            "at": "2026-10-20T10:07:49.840366+00:00",
+            "action": "source-validation"
+          },
+          {
+            "command": [
+              "python3",
+              "-B",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "tests"
+            ],
+            "commit": "117163fce64d021fef6e8e387ed47b0a18419599",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "a60e0d2d66e445b0734c0563e528ca7eae6f1b838b35a48522a62ef5a010522e",
+            "at": "2026-10-20T10:07:50.183186+00:00",
+            "action": "integration-validation",
+            "source_oid": "bf3dbf09f431c7763e955b0209e770cae2bde9db",
+            "target_base": "021e5c0c1fea29a545ebd342de51df88f2850cd3"
+          }
+        ],
+        "cleanup_actions": [
+          "remove-integration-worktree",
+          "remove-worktree",
+          "remove-branch"
+        ],
+        "complete": true,
+        "closure_passed": true
+      },
+      {
+        "task": "parallel-alpha-words-20261020-a1",
+        "started_at": "2026-10-20T10:11:40.318845+00:00",
+        "finished_at": "2026-10-20T10:12:28.806797+00:00",
+        "workspace": ".local/worktrees/parallel-alpha-words-20261020-a1",
+        "mode": "worktree",
+        "collision_reasons": [
+          "checkout reserved by another task",
+          "other project tasks are active",
+          "Peer-Agent /root/parallel_beta arbeitet gleichzeitig an diesem Projekt."
+        ],
+        "source_oid": "02d1d9a3d3833ffe3f62ae031550eeda9c516acd",
+        "target_base": "e5333f38c1521d90421b85d9a9118b2fa23a35b1",
+        "integration_commit": "f3af4d755767b4609b9c89b5ac94fcf83141cbb5",
+        "validation": [
+          {
+            "command": [
+              "python3",
+              "-B",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "tests"
+            ],
+            "commit": "02d1d9a3d3833ffe3f62ae031550eeda9c516acd",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "50f0f5c476b9cc9d182e8b7bfb84adc74b09dbf2f0fd2f0932c931aa24fa578a",
+            "at": "2026-10-20T10:12:27.545405+00:00",
+            "action": "source-validation"
+          },
+          {
+            "command": [
+              "python3",
+              "-B",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "tests"
+            ],
+            "commit": "f3af4d755767b4609b9c89b5ac94fcf83141cbb5",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "845c17abe8917ef03be6089aa97f29c61cf2e2871fee7e33a81bd78f58a46dc9",
+            "at": "2026-10-20T10:12:27.683505+00:00",
+            "action": "integration-validation",
+            "source_oid": "02d1d9a3d3833ffe3f62ae031550eeda9c516acd",
+            "target_base": "e5333f38c1521d90421b85d9a9118b2fa23a35b1"
+          }
+        ],
+        "cleanup_actions": [
+          "remove-integration-worktree",
+          "remove-worktree",
+          "remove-branch"
+        ],
+        "complete": true,
+        "closure_passed": true
+      },
+      {
+        "task": "parallel-beta-wordcount-20261020-01",
+        "started_at": "2026-10-20T10:11:42.584458+00:00",
+        "finished_at": "2026-10-20T10:12:23.568071+00:00",
+        "workspace": ".local/worktrees/parallel-beta-wordcount-20261020-01",
+        "mode": "worktree",
+        "collision_reasons": [
+          "checkout reserved by another task",
+          "other project tasks are active",
+          "collaboration.list_agents: /root/parallel_alpha arbeitet parallel im Projekt; eigener Checkout für Beta erforderlich"
+        ],
+        "source_oid": "2616f97742db66dd21d349f03a154c0277bc5096",
+        "target_base": "117163fce64d021fef6e8e387ed47b0a18419599",
+        "integration_commit": "e5333f38c1521d90421b85d9a9118b2fa23a35b1",
+        "validation": [
+          {
+            "command": [
+              "python3",
+              "-B",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "tests"
+            ],
+            "commit": "2616f97742db66dd21d349f03a154c0277bc5096",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "50f0f5c476b9cc9d182e8b7bfb84adc74b09dbf2f0fd2f0932c931aa24fa578a",
+            "at": "2026-10-20T10:12:22.249489+00:00",
+            "action": "source-validation"
+          },
+          {
+            "command": [
+              "python3",
+              "-B",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "tests"
+            ],
+            "commit": "e5333f38c1521d90421b85d9a9118b2fa23a35b1",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "50f0f5c476b9cc9d182e8b7bfb84adc74b09dbf2f0fd2f0932c931aa24fa578a",
+            "at": "2026-10-20T10:12:22.384879+00:00",
+            "action": "integration-validation",
+            "source_oid": "2616f97742db66dd21d349f03a154c0277bc5096",
+            "target_base": "117163fce64d021fef6e8e387ed47b0a18419599"
+          }
+        ],
+        "cleanup_actions": [
+          "remove-integration-worktree",
+          "remove-worktree",
+          "remove-branch"
+        ],
+        "complete": true,
+        "closure_passed": true
+      }
+    ],
+    "final_main": "f3af4d755767b4609b9c89b5ac94fcf83141cbb5",
+    "final_project_tests": 18,
+    "final_branches": [
+      "main"
+    ],
+    "final_worktree_count": 1,
+    "local_bare_remote_matches": true,
+    "active_checkout_locks": [],
+    "remaining_task_worktrees": [],
+    "fixture_removed_after_bundle_verification": true
+  },
+  "limits": [
+    "Only macOS/arm64 executed natively; Windows/Linux not accepted by these tests.",
+    "Cooperative checkout reservations do not block arbitrary OS writers.",
+    "Required project approvals and PR/squash strategy remain authoritative.",
+    "Integration requires an available project-local target checkout.",
+    "Published v1.0.0 remains unchanged; automation is on main."
+  ],
+  "temporary_artifacts_removed": true
+}

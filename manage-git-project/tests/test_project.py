@@ -474,14 +474,14 @@ class Lifecycle(unittest.TestCase):
         self.git("branch", "-D", "codex/change")
         self.cli("finish", "--outcome", "handoff", "--reason", "Await review", expect=2)
 
-    def test_active_worktree_task_prevents_removal_after_its_cli_exits(self):
+    def test_existing_cooperative_worktree_lock_prevents_removal_without_running_cli(self):
         self.begin()
         directory = self.branch(worktree=True)
         self.merge()
-        with contextlib.redirect_stdout(io.StringIO()):
-            code = project.main(["--project-root", str(self.repo), "--repo", str(directory),
-                                 "--task", "other-author", "begin", "--target", "main"])
-        self.assertEqual(code, 0)
+        # Model a reservation left by an older installed client. New clients
+        # reject begin in another task's registered worker before taking a lock.
+        lock = project.lock_path(self.repo / ".local/manage-git-project", directory)
+        project.write_json(lock / "owner.json", {"task": "other-author", "token": "older-client"})
         self.cli("remove-worktree", "--path", str(directory), "--idle-evidence",
                  "No running CLI; cooperative task is still active", expect=2)
         self.assertTrue(directory.exists())
@@ -570,6 +570,371 @@ class Lifecycle(unittest.TestCase):
         self.cli("remove-branch", "--branch", "codex/change")
         self.git("update-ref", "refs/heads/main", baseline, repo=remote)
         self.cli("check", expect=1)
+
+    def auto_start(self, task="fixture", *arguments):
+        return self.cli("start", "--target", "main", *arguments, task=task)
+
+    def auto_complete(self, task="fixture", expect=0, command=None, *arguments):
+        command = command or [sys.executable, "-B", "-c", "from pathlib import Path; assert Path('file.txt').exists()"]
+        return self.cli("complete", "--idle-evidence", "Isolated real Git fixture; no other processes use this task's worktrees",
+                        *arguments, "--test-command", *command, task=task, expect=expect)
+
+    def auto_change(self, start, name="feature.txt", content="task output\n"):
+        directory = Path(start["working_directory"])
+        (directory / name).write_text(content)
+        self.git("add", name, repo=directory)
+        self.git("commit", "-m", "verified task change", repo=directory)
+        return directory
+
+    def test_automatic_direct_task_completes_without_extra_branch(self):
+        start = self.auto_start()
+        self.assertEqual(start["mode"], "direct")
+        self.auto_change(start)
+        result = self.auto_complete()
+        self.assertTrue(result["passed"])
+        self.assertEqual(self.git("branch", "--format=%(refname:short)"), "main")
+
+    def test_automatic_collision_isolates_and_preserves_foreign_index_and_files(self):
+        (self.repo / "file.txt").write_text("staged foreign draft\n")
+        self.git("add", "file.txt")
+        (self.repo / "file.txt").write_text("unstaged foreign draft\n")
+        index = self.git("show", ":file.txt")
+        start = self.auto_start()
+        self.assertEqual(start["mode"], "worktree")
+        directory = self.auto_change(start)
+        self.auto_complete(expect=2)
+        self.assertEqual((self.repo / "file.txt").read_text(), "unstaged foreign draft\n")
+        self.assertEqual(self.git("show", ":file.txt"), index)
+        self.assertTrue(directory.exists())
+        self.assertEqual((directory / "file.txt").read_text(), "baseline\n")
+
+    def test_two_processes_start_with_one_direct_and_one_isolated_checkout(self):
+        processes = [subprocess.Popen([sys.executable, "-B", str(SCRIPT), "--project-root", str(self.repo),
+                                      "--task", task, "start", "--target", "main"],
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                     for task in ["chat-a", "chat-b"]]
+        results = []
+        for child in processes:
+            stdout, stderr = child.communicate(timeout=30)
+            self.assertEqual(child.returncode, 0, stderr + stdout)
+            results.append(json.loads(stdout))
+        self.assertEqual(sorted(item["mode"] for item in results), ["direct", "worktree"])
+        self.assertEqual(len({item["working_directory"] for item in results}), 2)
+
+    def test_simultaneous_same_task_id_cannot_overwrite_or_create_an_orphan(self):
+        processes = [subprocess.Popen([sys.executable, "-B", str(SCRIPT), "--project-root", str(self.repo),
+                                      "--task", "same-chat", "start", "--target", "main"],
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) for _ in range(2)]
+        codes = []
+        for child in processes:
+            child.communicate(timeout=30)
+            codes.append(child.returncode)
+        self.assertEqual(sorted(codes), [0, 2])
+        self.assertEqual(self.git("branch", "--format=%(refname:short)"), "main")
+
+    def test_custom_state_directory_cannot_bypass_checkout_lock(self):
+        self.begin()
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code = project.main(["--project-root", str(self.repo), "--state-dir", ".local/another-state",
+                                 "--task", "intruder", "begin", "--target", "main"])
+        self.assertEqual(code, 2, output.getvalue())
+
+    def test_parallel_owned_resources_do_not_block_incumbent_or_get_deleted(self):
+        self.begin()
+        first = self.auto_start("chat-a")
+        second = self.auto_start("chat-b")
+        first_dir = self.auto_change(first, "a.txt")
+        second_dir = self.auto_change(second, "b.txt")
+        before = self.git("rev-parse", "main")
+        pending = self.auto_complete("chat-a", expect=1)
+        self.assertTrue(pending["pending"])
+        self.assertEqual(self.git("rev-parse", "main"), before)
+        self.cli("finish")
+        self.auto_complete("chat-a")
+        first_merge = self.git("rev-parse", "main")
+        self.assertFalse(first_dir.exists())
+        self.assertTrue(second_dir.exists())
+        self.auto_complete("chat-b")
+        self.assertFalse(second_dir.exists())
+        self.assertEqual(self.git("branch", "--format=%(refname:short)"), "main")
+        self.assertTrue((self.repo / "a.txt").exists())
+        self.assertTrue((self.repo / "b.txt").exists())
+        state = json.loads((self.repo / ".local/manage-git-project/tasks/chat-b.json").read_text())
+        proofs = [item for item in state["receipts"] if item["action"] == "integration-validation"]
+        self.assertEqual(proofs[-1]["target_base"], first_merge)
+
+    def test_peer_task_branch_cannot_be_adopted_by_another_task(self):
+        self.begin()
+        other = self.auto_start("other-chat")
+        self.cli("track-branch", "--branch", other["branch"], "--reason", "Attempt to claim peer work", expect=2)
+
+    def test_failed_source_validation_keeps_main_and_worker(self):
+        start = self.auto_start("fixture", "--collision-reason", "Test host reports an active author")
+        directory = self.auto_change(start)
+        before = self.git("rev-parse", "main")
+        self.auto_complete(expect=2, command=[sys.executable, "-c", "raise SystemExit(1)"])
+        self.assertEqual(self.git("rev-parse", "main"), before)
+        self.assertTrue(directory.exists())
+        self.auto_complete()
+
+    def test_failed_combined_validation_keeps_main_unchanged_and_allows_retry(self):
+        start = self.auto_start("fixture", "--collision-reason", "Another author is expected")
+        directory = self.auto_change(start)
+        before = self.git("rev-parse", "main")
+        command = [sys.executable, "-c", "from pathlib import Path; raise SystemExit(1 if Path.cwd().name.startswith('integration-') else 0)"]
+        self.auto_complete(expect=2, command=command)
+        self.assertEqual(self.git("rev-parse", "main"), before)
+        self.assertTrue(directory.exists())
+        self.assertFalse(project.lock_path(self.repo / ".local/manage-git-project", self.repo).exists())
+        self.auto_complete()
+
+    def test_merge_conflict_preserves_main_and_both_task_histories(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        directory = self.auto_change(start, "file.txt", "worker change\n")
+        (self.repo / "file.txt").write_text("main change\n")
+        self.git("commit", "-am", "another completed task")
+        before = self.git("rev-parse", "main")
+        self.auto_complete(expect=2)
+        self.assertEqual(self.git("rev-parse", "main"), before)
+        self.assertEqual((self.repo / "file.txt").read_text(), "main change\n")
+        self.assertEqual((directory / "file.txt").read_text(), "worker change\n")
+        state = json.loads((self.repo / ".local/manage-git-project/tasks/fixture.json").read_text())
+        self.assertTrue(Path(state["automatic"]["staging"]).exists())
+
+    def test_automatic_remote_push_and_cleanup_are_explicit_and_resumable(self):
+        remote = self.remote()
+        start = self.auto_start("fixture", "--remote", "origin", "--require-push", "--collision-reason", "Concurrent author")
+        self.auto_change(start)
+        self.auto_complete(expect=2)
+        self.auto_complete("fixture", 0, None, "--push")
+        self.assertEqual(self.git("rev-parse", "main"), self.git("rev-parse", "main", repo=remote))
+        self.assertEqual(self.git("branch", "--format=%(refname:short)"), "main")
+
+    def test_ignored_worker_file_blocks_cleanup_without_holding_main(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        directory = self.auto_change(start)
+        (directory / "ignored").mkdir()
+        secret = directory / "ignored/private.txt"
+        secret.write_text("unique")
+        self.auto_complete(expect=2)
+        self.assertEqual(secret.read_text(), "unique")
+        self.assertFalse(project.lock_path(self.repo / ".local/manage-git-project", self.repo).exists())
+        secret.unlink()
+        self.auto_complete()
+
+    def test_retained_worker_output_is_mapped_to_identical_integrated_file(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        directory = self.auto_change(start)
+        self.cli("artifact", "--path", str(directory / "feature.txt"), "--disposition", "retain")
+        self.auto_complete()
+        self.assertEqual((self.repo / "feature.txt").read_text(), "task output\n")
+
+    def test_retained_task_is_not_merged_implicitly(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        directory = self.auto_change(start)
+        self.cli("retain", "--branch", start["branch"], "--reason", "Required review is pending")
+        self.auto_complete(expect=2)
+        self.assertFalse((self.repo / "feature.txt").exists())
+        self.assertTrue(directory.exists())
+
+    def test_cleanup_retry_after_branch_removal_uses_recorded_receipts(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        directory = self.auto_change(start)
+        temporary = self.repo / ".local/task-output.txt"
+        temporary.write_text("disposable synthetic output")
+        self.cli("artifact", "--path", str(temporary), "--disposition", "temporary")
+        self.auto_complete(expect=2)
+        self.assertFalse(directory.exists())
+        self.assertEqual(self.git("branch", "--format=%(refname:short)"), "main")
+        temporary.unlink()
+        self.assertTrue(self.auto_complete()["passed"])
+
+    def test_parallel_complete_of_same_task_cannot_release_running_target_lease(self):
+        self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        ready, release = self.repo / ".local/ready", self.repo / ".local/release"
+        command = [sys.executable, "-B", "-c", "import pathlib,time; "
+                   f"r=pathlib.Path({str(ready)!r}); r.touch(); "
+                   f"s=pathlib.Path({str(release)!r}); "
+                   "exec('while not s.exists(): time.sleep(0.02)')"]
+        child = subprocess.Popen([sys.executable, "-B", str(SCRIPT), "--project-root", str(self.repo),
+                                  "--task", "fixture", "complete", "--idle-evidence", "isolated fixture",
+                                  "--test-command", *command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.addCleanup(lambda: child.kill() if child.poll() is None else None)
+        deadline = time.monotonic() + 15
+        while not ready.exists() and child.poll() is None and time.monotonic() < deadline:
+            time.sleep(0.02)
+        self.assertTrue(ready.exists())
+        result = self.auto_complete(expect=2)
+        self.assertIn("invocation", result["error"])
+        self.assertTrue(project.lock_path(self.repo / ".local/manage-git-project", self.repo).exists())
+        release.touch()
+        stdout, stderr = child.communicate(timeout=30)
+        self.assertEqual(child.returncode, 0, stdout + stderr)
+        self.assertFalse(project.lock_path(self.repo / ".local/manage-git-project", self.repo).exists())
+
+    def test_peer_cannot_begin_in_owned_integration_stage(self):
+        self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        command = [sys.executable, "-B", "-c", "from pathlib import Path; raise SystemExit(Path.cwd().name.startswith('integration-'))"]
+        self.auto_complete(expect=2, command=command)
+        state = json.loads((self.repo / ".local/manage-git-project/tasks/fixture.json").read_text())
+        stage = Path(state["automatic"]["staging"])
+        self.cli("--repo", str(stage), "begin", "--target", "main", task="peer", expect=2)
+        self.assertTrue(stage.exists())
+        # A lock from an older cooperating tool must also prevent removal.
+        lock = project.lock_path(self.repo / ".local/manage-git-project", stage)
+        lock.mkdir(parents=True)
+        (lock / "owner.json").write_text(json.dumps({"token": "another-task"}))
+        self.auto_complete(expect=2)
+        self.assertTrue(stage.exists())
+        shutil.rmtree(lock)
+        self.auto_complete()
+
+    def test_conflict_resolved_in_worker_can_be_retested_and_completed(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        directory = self.auto_change(start, "file.txt", "worker change\n")
+        (self.repo / "file.txt").write_text("main change\n")
+        self.git("commit", "-am", "another completed task")
+        self.auto_complete(expect=2)
+        state = json.loads((self.repo / ".local/manage-git-project/tasks/fixture.json").read_text())
+        stage = Path(state["automatic"]["staging"])
+        self.git("merge", "--abort", repo=stage)
+        self.git("merge", "main", repo=directory, check=False)
+        (directory / "file.txt").write_text("main change\nworker change\n")
+        self.git("add", "file.txt", repo=directory)
+        self.git("commit", "-m", "preserve both changes", repo=directory)
+        self.auto_complete()
+        self.assertEqual((self.repo / "file.txt").read_text(), "main change\nworker change\n")
+
+    def test_source_advancement_during_candidate_validation_prevents_publication(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        directory = self.auto_change(start)
+        before = self.git("rev-parse", "main")
+        original = project.automation().validate
+        def validate(*args):
+            result = original(*args)
+            if args[1] != directory:
+                self.auto_change(start, "late.txt", "late work\n")
+            return result
+        with mock.patch.object(project.automation(), "validate", side_effect=validate):
+            self.auto_complete(expect=2)
+        self.assertEqual(self.git("rev-parse", "main"), before)
+        self.assertTrue((directory / "late.txt").exists())
+        self.auto_complete()
+        self.assertEqual((self.repo / "late.txt").read_text(), "late work\n")
+
+    def test_start_from_peer_worktree_creates_project_local_sibling(self):
+        first = self.auto_start("chat-a", "--collision-reason", "Concurrent author")
+        second = self.cli("--repo", first["working_directory"], "start", "--target", "main", task="chat-b")
+        self.assertEqual(Path(second["working_directory"]).parent, self.repo / ".local/worktrees")
+        self.auto_complete("chat-a")
+        self.auto_complete("chat-b")
+
+    def test_automatic_start_preflights_custom_state_before_creating_worktree(self):
+        self.cli("--state-dir", "tracked-state", "start", "--target", "main",
+                 "--collision-reason", "Concurrent author", expect=2)
+        self.assertEqual(self.git("branch", "--format=%(refname:short)"), "main")
+        self.assertEqual(len(project.worktrees(self.repo)), 1)
+
+    def test_custom_state_cannot_redirect_shared_coordination_outside_project(self):
+        external = self.base / "external-state"
+        external.mkdir()
+        (self.repo / ".local").mkdir()
+        (self.repo / ".local/manage-git-project").symlink_to(external, target_is_directory=True)
+        self.cli("--state-dir", ".local/other-state", "start", "--target", "main", expect=2)
+        self.assertEqual(list(external.iterdir()), [])
+
+    def test_automatic_target_can_be_develop(self):
+        self.git("branch", "-m", "main", "develop")
+        start = self.cli("start", "--target", "develop", "--collision-reason", "Concurrent author")
+        self.auto_change(start)
+        self.auto_complete()
+        self.assertEqual(self.git("branch", "--format=%(refname:short)"), "develop")
+
+    def test_missing_target_checkout_preserves_worker_until_checkout_is_available(self):
+        self.git("switch", "-c", "ongoing-work")
+        start = self.auto_start()
+        directory = self.auto_change(start)
+        self.auto_complete(expect=2)
+        self.assertTrue(directory.exists())
+        self.assertFalse((self.repo / "feature.txt").exists())
+        self.git("switch", "main")
+        self.auto_complete()
+        self.assertTrue((self.repo / "feature.txt").exists())
+        self.assertTrue(project.oid(self.repo, "ongoing-work"))
+
+    def test_new_worker_commit_after_blocked_cleanup_gets_fresh_validation(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        directory = self.auto_change(start)
+        (directory / "ignored").mkdir()
+        blocker = directory / "ignored/private.txt"
+        blocker.write_text("unique synthetic file")
+        self.auto_complete(expect=2)
+        first_merge = self.git("rev-parse", "main")
+        self.auto_change(start, "late.txt", "new committed work\n")
+        blocker.unlink()
+        self.auto_complete()
+        self.assertNotEqual(self.git("rev-parse", "main"), first_merge)
+        self.assertEqual((self.repo / "late.txt").read_text(), "new committed work\n")
+
+    def test_interrupted_stage_removal_recovers_from_persisted_intent(self):
+        self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        original = project.git
+        def interrupted(repo, *args, **kwargs):
+            result = original(repo, *args, **kwargs)
+            if args[:2] == ("worktree", "remove") and Path(args[-1]).name.startswith("integration-"):
+                raise OSError("Simulated interruption after successful stage removal")
+            return result
+        with mock.patch.object(project, "git", side_effect=interrupted):
+            self.auto_complete(expect=2)
+        self.assertTrue(self.auto_complete()["passed"])
+
+    def test_interrupted_branch_deletion_recovers_intent_and_cleans_configuration(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        self.auto_change(start)
+        self.git("config", "branch." + start["branch"] + ".description", "owned configuration")
+        original = project.git
+        def interrupted(repo, *args, **kwargs):
+            result = original(repo, *args, **kwargs)
+            if args[:2] == ("update-ref", "--stdin"):
+                raise OSError("Simulated interruption after successful branch deletion")
+            return result
+        with mock.patch.object(project, "git", side_effect=interrupted):
+            self.auto_complete(expect=2)
+        self.assertTrue(self.auto_complete()["passed"])
+        self.assertEqual(self.git("config", "--get", "branch." + start["branch"] + ".description", check=False), "")
+
+    def abrupt_complete(self, action):
+        arguments = ["--project-root", str(self.repo), "--task", "fixture", "complete", "--idle-evidence",
+                     "Isolated real process fixture", "--test-command", sys.executable, "-B", "-c", "pass"]
+        code = f"""import importlib.util, os
+from pathlib import Path
+spec=importlib.util.spec_from_file_location('project', {str(SCRIPT)!r})
+p=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(p)
+original=p.git
+def abrupt(repo,*args,**kwargs):
+    result=original(repo,*args,**kwargs)
+    if ({action!r} == 'stage' and args[:2] == ('worktree','remove') and Path(args[-1]).name.startswith('integration-')) or ({action!r} == 'branch' and args[:2] == ('update-ref','--stdin')):
+        os._exit(91)
+    return result
+p.git=abrupt
+raise SystemExit(p.main({arguments!r}))
+"""
+        child = subprocess.run([sys.executable, "-B", "-c", code], capture_output=True, text=True, timeout=30)
+        self.assertEqual(child.returncode, 91, child.stdout + child.stderr)
+        self.assertTrue(self.auto_complete(command=[sys.executable, "-B", "-c", "pass"])["passed"])
+        self.assertEqual(self.git("branch", "--format=%(refname:short)"), "main")
+        self.assertEqual(len(project.worktrees(self.repo)), 1)
+
+    def test_process_exit_after_stage_deletion_releases_leases_and_recovers(self):
+        self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        self.abrupt_complete("stage")
+
+    def test_process_exit_after_branch_deletion_releases_leases_and_recovers(self):
+        start = self.auto_start("fixture", "--collision-reason", "Concurrent author")
+        self.auto_change(start)
+        self.abrupt_complete("branch")
 
 
 if __name__ == "__main__":

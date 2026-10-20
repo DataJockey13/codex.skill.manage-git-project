@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Task-scoped Git inventory, artifact receipts and guarded local cleanup.
 
-Python >=3.9, Git with `worktree list --porcelain -z`. No shell, remote writes,
-implicit merges, force deletion, reset, stash, repository-wide clean, or home scan.
+Python >=3.9, Git with `worktree list --porcelain -z`. No shell, implicit remote writes,
+force deletion, reset, stash, repository-wide clean, or home scan. Automatic
+integration is explicit through start/complete and the project's validation.
 """
 from __future__ import annotations
 
 import argparse
 import datetime as dt
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -18,6 +20,22 @@ import subprocess
 import sys
 import tempfile
 import uuid
+from types import SimpleNamespace
+
+_AUTOMATION = None
+
+
+def automation():
+    global _AUTOMATION
+    if _AUTOMATION is None:
+        spec = importlib.util.spec_from_file_location("git_project_automation", Path(__file__).with_name("automation.py"))
+        _AUTOMATION = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_AUTOMATION)
+    return _AUTOMATION
+
+
+def api():
+    return SimpleNamespace(**globals())
 
 
 class Refused(Exception):
@@ -194,9 +212,14 @@ def load_task(args):
     path = base / "tasks" / f"{args.task}.json"
     require(path.is_file(), "Task has not been started")
     data = json.loads(path.read_text())
+    if data.get("automatic") and args.repo is None:
+        repo = Path(data["repo"])
     require(data["project"] == str(project) and data["repo"] == str(repo), "Task belongs to another checkout")
     require(data["state"] == "active", "Task is already closed; use a new task ID")
-    lock = lock_path(base, repo)
+    lock = lock_path(automation().coordination(project), repo)
+    if (data.get("automatic", {}).get("phase") == "publishing" and args.command == "complete"
+            and data["repo"] != data["automatic"]["workspace"]):
+        return project, repo, path, data
     require((lock / "owner.json").is_file(), "Task lock is missing")
     owner = json.loads((lock / "owner.json").read_text())
     require(owner["token"] == data["token"], "Another task owns this checkout")
@@ -205,6 +228,16 @@ def load_task(args):
 
 def begin(args):
     project, repo, base = locations(args)
+    automation().ensure_ignored(api(), project, repo)
+    with automation().guard(project):
+        automation().reserve_id(api(), project, base / "tasks" / (args.task + ".json"), args.task)
+        return _begin(args)
+
+
+def _begin(args):
+    project, repo, base = locations(args)
+    _, owned_trees = automation().resources(automation().peers(api(), project, repo, base / "tasks" / (args.task + ".json")))
+    require(str(repo) not in owned_trees, "Checkout belongs to another active task")
     snapshot = inspect(project, repo, args.target)
     require(snapshot["repo"] == str(repo), "Pass the actual Git checkout root as --repo")
     require(snapshot["checkout_inside_project"], "Checkout must be inside the canonical project")
@@ -222,21 +255,28 @@ def begin(args):
     require(not path.exists(), "Task ID already exists; inspect it instead of overwriting its history")
     adopted = [str(absolute(repo, p).relative_to(repo)) for p in args.adopt_path]
     require(not adopted or args.adopt_reason.strip(), "Adopting existing own work requires its authorization/reason")
-    lock = lock_path(base, repo)
+    lock = lock_path(automation().coordination(project), repo)
     lock.parent.mkdir(parents=True, exist_ok=True)
     try:
         lock.mkdir()
     except FileExistsError:
         raise Refused("Checkout is reserved by another task; do not steal or infer expiry from a dead CLI PID")
+    try:
+        snapshot = inspect(project, repo, args.target)
+    except BaseException:
+        shutil.rmtree(lock)
+        raise
     token = uuid.uuid4().hex
     data = {"version": 1, "task": args.task, "token": token, "project": str(project),
             "repo": str(repo), "target": args.target, "remote": args.remote,
             "require_push": args.require_push, "started_at": now(), "state": "active",
             "baseline": snapshot, "adopted_paths": adopted, "adopt_reason": args.adopt_reason,
             "branches": {}, "artifacts": [], "resource_exceptions": {}, "receipts": []}
+    data["git_common_dir"] = automation().common_dir(api(), repo)
     try:
         write_json(lock / "owner.json", {"task": args.task, "token": token, "started_at": now()})
         write_json(path, data)
+        automation().register(api(), project, path, data)
     except BaseException:
         shutil.rmtree(lock)
         raise
@@ -244,6 +284,14 @@ def begin(args):
 
 
 def track_branch(args):
+    project, repo, path, data = load_task(args)
+    with automation().guard(project):
+        owned, _ = automation().resources(automation().peers(api(), project, repo, path))
+        require(args.branch not in owned, "Branch belongs to another project task")
+        return _track_branch(args)
+
+
+def _track_branch(args):
     project, repo, path, data = load_task(args)
     require(args.branch != data["target"], "Never own/delete the integration target")
     commit = oid(repo, "refs/heads/" + args.branch)
@@ -334,7 +382,7 @@ def remove_worktree(args):
     candidate = absolute(project, args.path).resolve()
     require(candidate != project and candidate != repo and contained(project, candidate), "Protected/outside checkout")
     require(args.idle_evidence.strip(), "Verify active agents/processes and provide concrete idle evidence")
-    candidate_lock = lock_path(path.parent.parent, candidate)
+    candidate_lock = lock_path(automation().coordination(project), candidate)
     require(not candidate_lock.exists(), "Worktree is reserved by an active cooperative task")
     records = [x for x in worktrees(repo) if Path(x["worktree"]).resolve() == candidate]
     require(len(records) == 1 and "branch" in records[0], "Worktree must be registered with a task branch")
@@ -386,17 +434,24 @@ def remove_branch(args):
     # Atomically verify both refs; another worktree may otherwise move the target.
     transaction = (f"start\nverify refs/heads/{data['target']} {target}\n"
                    f"delete refs/heads/{args.branch} {commit}\nprepare\ncommit\n")
-    git(repo, "update-ref", "--stdin", input=transaction)
     receipt = {"action": "remove-branch", "branch": args.branch, "oid": commit,
                "target_oid": target, "integration_evidence": evidence,
                "remote_checked": data["remote"], "at": now()}
-    data["receipts"].append(receipt)
+    data["pending_branch_removal"] = receipt
     write_json(path, data)
-    configured = git(repo, "config", "--local", "--get-regexp", "^branch\\." + re.escape(args.branch) + "\\.", allow_failure=True)
+    git(repo, "update-ref", "--stdin", input=transaction)
+    data["receipts"].append(receipt)
+    data.pop("pending_branch_removal")
+    write_json(path, data)
+    remove_branch_config(repo, args.branch)
+    return receipt
+
+
+def remove_branch_config(repo, branch):
+    configured = git(repo, "config", "--local", "--get-regexp", "^branch\\." + re.escape(branch) + "\\.", allow_failure=True)
     require(configured.returncode in (0, 1), "Could not inspect branch configuration")
     if configured.returncode == 0:
-        git(repo, "config", "--local", "--remove-section", "branch." + args.branch)
-    return receipt
+        git(repo, "config", "--local", "--remove-section", "branch." + branch)
 
 
 def adopted(name, data):
@@ -405,15 +460,19 @@ def adopted(name, data):
 
 def check(args):
     project, repo, path, data = load_task(args)
-    snapshot = inspect(project, repo, data["target"])
+    with automation().guard(project):
+        snapshot = inspect(project, repo, data["target"])
+        peer_branches, peer_trees = automation().resources(automation().peers(api(), project, repo, path))
     errors, retained = [], []
     if args.outcome == "complete" and not ancestor(repo, snapshot["head"], "refs/heads/" + data["target"]):
         errors.append("Current checkout contains work not integrated into the configured target")
-    untracked_branches = set(snapshot["branches"]) - set(data["baseline"]["branches"]) - set(data["branches"])
+    untracked_branches = set(snapshot["branches"]) - set(data["baseline"]["branches"]) - set(data["branches"]) - peer_branches
     if untracked_branches:
         errors.append("New branches lack task ownership records: " + ", ".join(sorted(untracked_branches)))
     known_worktrees = {x["worktree"] for x in data["baseline"]["worktrees"]}
     known_worktrees.update(p for branch in data["branches"].values() for p in branch["worktrees"])
+    known_worktrees.update(peer_trees)
+    known_worktrees.update(data.get("automatic", {}).get("infrastructure", []))
     if any(x["worktree"] not in known_worktrees for x in snapshot["worktrees"]):
         errors.append("New worktrees lack task ownership records")
     for name, original in data["baseline"]["status"].items():
@@ -502,7 +561,7 @@ def finish(args):
     data["final_check"] = result
     data["finished_at"] = now()
     write_json(path, data)
-    shutil.rmtree(lock_path(path.parent.parent, repo))
+    shutil.rmtree(lock_path(automation().coordination(project), repo))
     return result
 
 
@@ -521,6 +580,19 @@ def parser():
     command.add_argument("--require-push", action="store_true")
     command.add_argument("--adopt-path", action="append", default=[])
     command.add_argument("--adopt-reason", default="")
+    command = commands.add_parser("start", help="Automatically reserve a checkout or isolate a colliding task")
+    command.add_argument("--target", required=True)
+    command.add_argument("--remote")
+    command.add_argument("--require-push", action="store_true")
+    command.add_argument("--collision-reason", default="", help="Actual host evidence of a non-cooperating writer")
+    command.add_argument("--adopt-path", action="append", default=[])
+    command.add_argument("--adopt-reason", default="")
+    command = commands.add_parser("complete", help="Validate, integrate, optionally push and clean an automatic task")
+    command.add_argument("--idle-evidence", required=True)
+    command.add_argument("--wait", type=float, default=0)
+    command.add_argument("--test-timeout", type=float, default=300)
+    command.add_argument("--push", action="store_true")
+    command.add_argument("--test-command", nargs=argparse.REMAINDER, required=True)
     command = commands.add_parser("track-branch")
     command.add_argument("--branch", required=True)
     command.add_argument("--reason", default="")
@@ -560,10 +632,15 @@ def main(argv=None):
         else:
             functions = {"begin": begin, "track-branch": track_branch, "artifact": artifact,
                          "retain": retain, "remove-worktree": remove_worktree,
-                         "remove-branch": remove_branch, "check": check, "finish": finish}
+                         "remove-branch": remove_branch, "check": check, "finish": finish,
+                         "start": lambda a: automation().start(api(), a),
+                         "complete": lambda a: automation().complete(api(), a)}
             result = functions[args.command](args)
         print(json.dumps(result, ensure_ascii=True, indent=2))
         return 0 if result.get("passed", True) else 1
+    except subprocess.TimeoutExpired:
+        print(json.dumps({"passed": False, "error": "Validation or process inspection timed out; task resources were preserved"}))
+        return 2
     except (Refused, OSError, ValueError, KeyError) as exc:
         print(json.dumps({"passed": False, "error": str(exc)}, ensure_ascii=True))
         return 2

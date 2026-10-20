@@ -1,44 +1,21 @@
 # manage-git-project
 
-Ein Codex-Skill für Git-Aufgaben vom Arbeitsbeginn bis zum geprüften Abschluss.
-Er hilft dir, Ergebnisse im richtigen Projekt abzulegen, vorhandene Arbeit zu
-bewahren und erledigte Branches und Worktrees nach belegter Integration zu
-bereinigen.
+Ein Codex-Skill, der Git-Projektarbeit automatisch begleitet: Bei möglichen
+Kollisionen arbeitet dein Chat in einem eigenen Branch mit Worktree. Nach
+Tests und erforderlichen Freigaben wird die fertige Arbeit in `main` integriert;
+erledigte eigene Branches und Arbeitskopien werden geprüft und bereinigt.
 
-Der Skill kombiniert eine Arbeitsanleitung für Codex mit einem Python-Werkzeug
-für Aufgabeninventar, Artefaktnachweise und Abschlussprüfungen.
+Du beschreibst deine Aufgabe wie gewohnt. Codex übernimmt die Git-Schritte im
+Hintergrund. Zielbranch, Commit-, Push- und Review-Regeln kommen aus deinem
+Projekt; `main` ist das übliche Beispiel, keine feste Vorgabe.
 
-[Version 1.0 herunterladen](https://github.com/DataJockey13/codex.skill.manage-git-project/releases/tag/v1.0.0)
-· [Skill-Anleitung](manage-git-project/SKILL.md)
-· [Installationsprüfung](docs/public-install-v1.0.0.md)
+[Skill-Anleitung](manage-git-project/SKILL.md)
+· [Automatischer Ablauf](manage-git-project/references/automation.md)
+· [Veröffentlichte Version 1.0](https://github.com/DataJockey13/codex.skill.manage-git-project/releases/tag/v1.0.0)
 
-## Wann hilft dir der Skill?
+## Einmal einrichten
 
-- Du möchtest eine Änderung einschließlich Tests, Commit, Integration und
-  Bereinigung abschließen.
-- Im Projekt liegen bereits fremde Änderungen, die erhalten bleiben müssen.
-- Du arbeitest mit mehreren Branches oder Worktrees und möchtest vor dem
-  Entfernen Integration, Dateibestand und Aktivität prüfen.
-- Ergebnisse oder temporäre Dateien sollen nachvollziehbar im Projekt bleiben
-  beziehungsweise nach geprüftem Abgleich entfernt werden.
-- Offene Arbeit soll mit einem konkreten Grund als Übergabe erhalten bleiben.
-
-Der Zielbranch und die Commit-, Push- und Review-Regeln kommen aus deinem
-Projekt. Der Skill setzt keinen bestimmten Branch oder Hostinganbieter voraus.
-
-## Voraussetzungen
-
-- Codex mit Skill-Unterstützung und Zugriff auf dein lokales Git-Projekt.
-- Python **ab 3.9**; für das Werkzeug und seine Verhaltenstests brauchst du keine
-  zusätzlichen Python-Pakete.
-- Git mit Unterstützung für `git worktree list --porcelain -z`.
-
-Wenn `lsof` verfügbar ist, verwendet das Werkzeug es zusätzlich zur Prüfung
-aktiver Prozesse vor einer Worktree-Entfernung.
-
-## Installation
-
-### Mit dem Codex Skill Installer
+### 1. Aktuellen Skill installieren
 
 Gib Codex diesen Auftrag:
 
@@ -46,86 +23,123 @@ Gib Codex diesen Auftrag:
 Nutze $skill-installer und installiere manage-git-project aus
 https://github.com/DataJockey13/codex.skill.manage-git-project
 Unterordner: manage-git-project
-Version/Ref: v1.0.0
+Version/Ref: main
 ```
 
-Installiert wird der Unterordner `manage-git-project`, der die `SKILL.md`
-enthält. Die feste Versionsangabe hält die Installation auf dem veröffentlichten
-Stand. Falls der Skill anschließend nicht angezeigt wird, starte Codex neu.
-Hinweise zur Erkennung und Verwendung von Skills findest du in der
-[offiziellen OpenAI-Dokumentation](https://learn.chatgpt.com/docs/build-skills).
+**Die hier beschriebene Automatik liegt auf `main`.** Das bestehende Release
+`v1.0.0` enthält den früheren manuellen Ablauf. Eine darauf festgelegte
+Installation musst du auf den aktuellen Stand aktualisieren. Prüfe eine
+vorhandene Installation, bevor du sie ersetzt.
 
-### Manuell aus dem Release
+Installiert wird der Unterordner mit der `SKILL.md`. Falls der Skill anschließend
+nicht angezeigt wird, starte Codex neu. Alternativ kannst du diesen Unterordner
+manuell nach `~/.agents/skills/manage-git-project` kopieren. Hinweise zur
+Skill-Erkennung findest du in der
+[OpenAI-Dokumentation](https://learn.chatgpt.com/docs/build-skills).
 
-Lade aus dem [Release v1.0.0](https://github.com/DataJockey13/codex.skill.manage-git-project/releases/tag/v1.0.0)
-die Datei `manage-git-project-v1.0.0.zip` und die zugehörige `.sha256`-Datei.
-Prüfe die SHA-256-Summe und entpacke das ZIP. Kopiere den enthaltenen Ordner
-`manage-git-project` in deinen persönlichen Skill-Ordner `~/.agents/skills/`.
-Die Anleitung liegt danach unter
-`~/.agents/skills/manage-git-project/SKILL.md`.
-Prüfe eine vorhandene Installation, bevor du sie ersetzt.
+### 2. Automatische Verwendung festlegen
 
-## Nutzung
+Ergänze einmal die `AGENTS.md` deines Projekts, damit jeder Chat den Ablauf
+verwendet:
 
-Öffne dein Git-Projekt in Codex und nenne den Skill zusammen mit deiner Aufgabe:
+```markdown
+## Git-Arbeitsablauf
+
+Verwende bei Dateiänderungen und zum Aufgabenabschluss den installierten
+Skill manage-git-project selbstständig. Kanonisches Projekt ist dieses
+Repository; Integrationsziel ist main. Nutze bei Kollisionen den automatischen
+Start mit eigenem Branch und Worktree. Integriere erfolgreich geprüfte und
+freigegebene Arbeit und bereinige erledigte eigene Ressourcen. Beachte unsere
+Commit-, Push- und Review-Regeln und bewahre fremde Arbeit.
+```
+
+Passe den Zielbranch an dein Projekt an. Wenn du den Skill projektübergreifend
+verwenden möchtest, kann die entsprechende Anweisung in deiner benutzerweiten
+`AGENTS.md` stehen; Projektvorgaben bleiben maßgeblich.
+
+Ergänze außerdem diese lokalen Ablagen in der `.gitignore` deines Projekts,
+sofern sie noch nicht durch vorhandene Regeln abgedeckt sind:
+
+```gitignore
+/.local/manage-git-project/
+/.local/worktrees/
+```
+
+## Im Alltag
+
+Ein normaler Auftrag reicht, zum Beispiel:
 
 ```text
-Nutze $manage-git-project für diese Aufgabe: [beschreibe deine Änderung].
-Beachte die AGENTS.md und die Commit-, Push- und Review-Regeln dieses Projekts.
-Erhalte vorhandene fremde Arbeit und führe die Aufgabe bis zum geprüften
-Abschluss einschließlich Integration und Bereinigung aus.
+Ergänze eine Suche nach Kundennamen und prüfe die Änderung.
 ```
 
-Codex prüft zunächst den Projektzustand und andere aktive Schreiber. Für
-Dateiänderungen beginnt es einen Aufgabenstatus mit kooperativem Checkout-Lock.
-Während der Arbeit werden eigene Branches und relevante Artefakte zugeordnet.
-Nach Prüfung und Integration kontrolliert das Werkzeug den Abschluss und gibt
-den Lock erst bei erfolgreichem `finish` frei. Tatsächlich offene Arbeit wird
-als begründete Übergabe ausgewiesen.
+Du musst den Skill nicht bei jeder Aufgabe erwähnen. Codex prüft Projektzustand
+und andere Schreiber. Ein freier sauberer Zielcheckout wird direkt verwendet.
+Bei einer Kollision entsteht ein eigener Branch `codex/<Aufgabe>` mit Worktree
+unter `.local/worktrees/`. Parallele Chats bearbeiten so getrennte Dateien und
+teilen sich nicht denselben schreibenden Checkout.
 
-Der Aufgabenstatus liegt standardmäßig unter `.local/manage-git-project/` im
-jeweiligen Projekt. Dieser Bereich muss in Git ignoriert sein. Die vollständigen
-Befehle und Optionen stehen in der [Skill-Anleitung](manage-git-project/SKILL.md)
-und unter [Integration und Abschluss](manage-git-project/references/closure.md).
+Nach dem Commit der eigenen Änderungen prüft Codex den Aufgabenstand sowie den
+Merge mit dem aktuellen Zielstand. Die Integration in `main` erfolgt nacheinander.
+Danach werden der eigene Worktree und Branch nach Bestands-, Aktivitäts- und
+Integrationsprüfung entfernt. Ein nach Projektregeln autorisierter Push kann
+zum Abschluss gehören.
 
-## Prüfungen und Grenzen
+Testfehler, Mergekonflikte, ausstehende Freigaben oder einzigartige lokale Daten
+verhindern einen erfolgreichen Abschluss. Codex behebt die Ursache im Rahmen
+deines Auftrags und prüft erneut. Belegte offene Arbeit bleibt mit einem
+konkreten Grund erhalten. Ein fremder belegter Zielcheckout wird nicht übernommen.
 
-Version 1.0 wurde auf **macOS/arm64 mit Python 3.9.6 und Git 2.50.1** geprüft:
-Alle **46 Verhaltenstests** bestehen. Zusätzlich wurden anonyme Installation
-aus GitHub per Download und Git sowie ein vollständiger Aufgabenablauf aus der
-isoliert installierten Kopie geprüft. Die Tests verwenden echte lokale
-Git-Repositories und Bare-Remotes.
+## Voraussetzungen und Grenzen
 
-Der Lock koordiniert Nutzer dieses Ablaufs. Er ist keine globale Schreibsperre;
-andere aktive Schreiber müssen zusätzlich geprüft werden. Unbekannte externe
-Dateien werden nicht automatisch vollständig erfasst. Das Werkzeug führt keine
-Merges oder Remote-Schreibzugriffe aus; Codex erledigt diese im Rahmen deines
-Auftrags und der Projektregeln.
+Du brauchst Codex mit Skill-Unterstützung, Python **ab 3.9** und Git mit
+Unterstützung für `git worktree list --porcelain -z`. Python-Zusatzpakete werden
+nicht benötigt. Ist `lsof` vorhanden, wird es vor Worktree-Entfernungen zusätzlich
+zur Prozessprüfung verwendet.
 
-Eine native Windows- oder Linux-Prüfung sowie die automatische Skill-Auswahl in
-einer neuen Codex-Sitzung sind nicht belegt. Details findest du im
-[Abschlussaudit](docs/closure-audit-v1.0.0.md) und in der
-[öffentlichen Installationsprüfung](docs/public-install-v1.0.0.md).
+Die Automatik wird von Codex beim Bearbeiten deiner Aufgabe ausgeführt; sie ist
+kein dauerhaft laufender Dienst. Die einmalige `AGENTS.md`-Regel macht ihre
+Verwendung zur Projektanweisung. Kooperative Locks koordinieren beteiligte
+Chats. Andere aktive Prozesse und Schreiber müssen zusätzlich geprüft werden;
+es gibt keine globale Dateischreibsperre.
 
-## Tests selbst ausführen
+Der Zielbranch benötigt einen verfügbaren Checkout innerhalb des kanonischen
+Projekts. Nicht kooperierende Schreiber, unbekannte externe Dateien und
+projektbezogene Freigaben werden nicht durch einen Lock ersetzt. Es gibt keinen
+Force-Push und keine automatische Löschung veröffentlichter Aufgabenbranches.
+Projekte mit verbindlichem PR-/Squash-Verfahren verwenden für die Integration
+ihren vorgeschriebenen Ablauf.
 
-Klone dieses Repository und führe die Verhaltenstests aus dessen Hauptordner aus:
+## Prüfungen
+
+Die Verhaltenstests verwenden echte lokale Git-Repositories und Bare-Remotes.
+Alle **75 Verhaltenstests** bestehen auf macOS/arm64. Die aktuelle Automatik
+wurde zusätzlich mit zwei parallelen Agenten-Chats in zwei aufeinanderfolgenden
+Runden in einem isolierten Testprojekt geprüft. Details und Ergebnisse stehen im
+[Automatik-Prüfnachweis](docs/automatic-worktrees.md).
+
+Die frühere öffentliche Installation von `v1.0.0` wurde separat auf macOS/arm64
+geprüft; die damaligen 46 Tests und der vollständige Installationsablauf sind im
+[Versionsnachweis](docs/public-install-v1.0.0.md) dokumentiert. Daraus folgt keine
+native Abnahme für Windows oder Linux.
+
+Zum eigenen Testen:
 
 ```sh
 git clone https://github.com/DataJockey13/codex.skill.manage-git-project.git
 cd codex.skill.manage-git-project
-python3 manage-git-project/tests/test_project.py \
+python3 -B manage-git-project/tests/test_project.py \
   --scratch-root .local/test-repositories \
   --report .local/verification/tests.json
 ```
 
-Die Tests schreiben nicht auf GitHub. Verbleibende Test-Repositories sind im
+Die Tests schreiben nicht auf GitHub. Verbleibende Test-Repositories werden im
 JSON-Bericht aufgeführt und sollten vor einer Bereinigung geprüft werden.
 
 ## Weiterführende Dokumentation
 
-- [Prüfskript](manage-git-project/scripts/project.py) und
-  [Verhaltenstests](manage-git-project/tests/test_project.py)
-- [Prüfnachweis zu Version 1.0](docs/verification/2026-10-19-v1.0.0.json)
-- [Reproduzierbarer öffentlicher Installationscheck](docs/verification/verify_public_install.py)
+- [Skript](manage-git-project/scripts/project.py) und [Automationsmodul](manage-git-project/scripts/automation.py)
+- [Verhaltenstests](manage-git-project/tests/test_project.py)
+- [Manuelle Integration und Übergaben](manage-git-project/references/closure.md)
+- [Öffentlicher Installationscheck für v1.0.0](docs/verification/verify_public_install.py)
 - [Herkunft und Übertragungsnachweis](docs/migration.json)

@@ -1,5 +1,9 @@
 # Integration und Abschluss
 
+Für neue normale Aufgaben verwende [Automatische Aufgaben](automation.md) mit
+`start` und `complete`. Diese Referenz beschreibt den manuellen Ablauf für
+Altbestände, abweichende Integrationsstrategien, Artefaktmigration und Übergaben.
+
 Alle Aufrufe verwenden `python3 <Skill>/scripts/project.py --project-root
 <Projekt> --task <Kennung>` als gemeinsamen Anfang. Parameter vor dem Unterbefehl
 stehen vor `begin`, `check` usw. Die Beispiele sind Argumentvorlagen; Dateinamen
@@ -25,7 +29,8 @@ eine gesonderte, ausdrücklich beauftragte Bestandsprüfung.
 
 Tests und erforderliche Reviews erfolgen vor der Integration. Committe nur
 die eigenen Änderungen. Merge beziehungsweise Squash folgt der Projektstrategie;
-der Skill führt selbst keine Merges aus. Konflikte nicht durch Verwerfen fremder
+der manuelle Ablauf überlässt diese Git-Schritte dem Agenten. `complete` führt
+im automatischen Ablauf selbst einen geprüften Merge aus. Konflikte nicht durch Verwerfen fremder
 Änderungen lösen. Nicht freigegebene, unfertige oder verworfene Experimente
 werden nicht automatisch integriert.
 
@@ -33,8 +38,9 @@ Vor dem Entfernen veröffentlichter Zweige muss der enthaltene Stand auch auf
 dem tatsächlichen Remote-Ziel vorhanden sein. Tracking-Refs allein reichen
 nicht; `ls-remote` prüft den Live-Stand. Bei unbekannten Objekten den bekannten
 Projekt-Remote gezielt fetchen und erneut prüfen, keine Integration erraten.
-Eine Remote-Löschung ist ein eigener beauftragter Git-Schritt; die Skripte
-schreiben niemals auf Remotes. Bei verändertem Remote-Stand erneut abgleichen.
+Eine Remote-Löschung ist ein eigener beauftragter Git-Schritt. Nur
+`complete --push` schreibt auf den ausgewählten Remote-Zielbranch, wenn dessen
+Veröffentlichung autorisiert ist. Bei verändertem Remote-Stand erneut abgleichen.
 Keine History-Umschreibung, kein Force-Push, kein pauschales Löschen nach Präfix.
 
 ## Eigene Arbeitskopie entfernen

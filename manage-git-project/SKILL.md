@@ -1,99 +1,76 @@
 ---
 name: manage-git-project
 description: >-
-  Organisiere Dateiänderungen in Git-Projekten vom Arbeitsbeginn bis zum geprüften
-  Abschluss mit kanonischer Ablage, aufgabenbezogenen Arbeitskopien, Integration
-  und Bereinigung. Verwende den Skill auch bei beauftragter Zusammenführung
-  verstreuter Projektdateien oder erledigter Branches; reine Lesefragen erzeugen
-  keinen Aufgabenstatus.
+  Begleite Dateiänderungen in Git-Projekten automatisch von der Bestandsprüfung
+  bis zu Tests, Integration und Bereinigung. Isoliere kollidierende Aufgaben in
+  eigenen Branches und projektinternen Worktrees. Verwende den Skill auch für
+  beauftragte Zusammenführung; reine Lesefragen erzeugen keinen Aufgabenstatus.
 ---
 
 # Git-Projektarbeit verwalten
 
-Arbeite innerhalb des beauftragten Projekts und seiner geltenden Anweisungen.
-Bestimme den kanonischen Projektordner und den Integrationsbranch aus dem
-Auftrag und den Projektregeln. Setze nicht pauschal `main` voraus. Ein neuer
-Chat benötigt keinen neuen Branch. Dieser Skill erweitert keine Freigaben für
-Reviews, Remote-Änderungen, Deployments oder fremde Arbeit.
+Verwende diesen Ablauf bei Dateiänderungen selbstständig im Hintergrund.
+Bestimme kanonisches Projekt und Integrationsziel aus Auftrag und `AGENTS.md`;
+das Ziel kann etwa `main` heißen. Der Benutzer muss weder den Skill nennen noch
+Git-Befehle vorgeben. Projektregeln für Commit, Push, Review und Freigabe gelten
+weiterhin. Eine Arbeitsanweisung erteilt keine zusätzlichen Veröffentlichungsrechte.
 
 ## Vor dem Schreiben
 
-1. Lies die geltenden `AGENTS.md` einschließlich projektbezogener Overrides.
-   Prüfe über die verfügbaren Host-Werkzeuge, ob andere Agenten denselben
-   Checkout verändern. Vorhandene Arbeit bewahren; nicht automatisch staschen,
-   zurücksetzen oder zusammen mit eigenen Änderungen committen.
-2. Verwende `scripts/project.py inspect` für Branch, Upstream, Status und
-   registrierte Worktrees. Prüfe bei alten Arbeitskopien auch deren tatsächlichen
-   Dateibestand; eine Git-Registrierung ist kein vollständiges Dateiinventar.
-3. Lege Ausgaben, temporäre Projektarbeit und notwendige zusätzliche Worktrees
-   von Anfang an innerhalb des kanonischen Projekts an. Verwende vorhandene
-   Struktur und ignorierte lokale Bereiche. Installierte Werkzeuge und ihre
-   allgemeinen Programmdaten sind davon getrennt; Projektlieferdateien dürfen
-   nicht als Programmdaten ausgelagert werden.
-4. Starte für Dateiänderungen einen Aufgabenstatus mit `begin`. Wähle eine
-   eindeutige Aufgabenkennung. Der kooperative Checkout-Lock bleibt bis `finish`
-   bestehen und wird nicht wegen eines beendeten CLI-Prozesses gestohlen.
-   Eine reine Untersuchung benötigt weder Lock noch neue Dateien.
+1. Lies die geltenden Projektanweisungen. Prüfe mit den verfügbaren
+   Host-Werkzeugen andere aktive Agenten und Prozesse im betroffenen Checkout.
+   Bewahre fremde Änderungen und einzigartige Daten.
+2. Prüfe mit `inspect` Git-Zustand und Arbeitskopien. Verwende für Änderungen
+   den automatischen Ablauf aus [Automatische Aufgaben](references/automation.md).
+   `start` verwendet den freien sauberen Zielcheckout oder erstellt bei Kollision
+   selbstständig `codex/<Kennung>` mit einem Worktree unter `.local/worktrees/`.
+   Melde zusätzlich erkannte fremde Schreiber über `--collision-reason`.
+3. Verwende danach für **alle** Dateiänderungen, Tests, Commits und projektbezogenen
+   Ausgaben das zurückgegebene `working_directory`. Auch temporäre Arbeit und
+   weitere Worktrees gehören in das kanonische Projekt. Allgemeine installierte
+   Werkzeuge bleiben an ihren Betriebsorten.
 
 ```sh
-python3 <Skill>/scripts/project.py --project-root <Projekt> inspect --target <Zielbranch>
-python3 <Skill>/scripts/project.py --project-root <Projekt> --task <Kennung> begin --target <Zielbranch> --remote <Remote>
+python3 <Skill>/scripts/project.py --project-root <Projekt> inspect --target <Ziel>
+python3 <Skill>/scripts/project.py --project-root <Projekt> --task <EindeutigeKennung> start --target <Ziel>
 ```
 
-Lasse `--remote` nur bei rein lokaler Arbeit ohne zu prüfendes Remote weg.
-`--require-push` verlangt am Ende die Veröffentlichung des Zielstands.
-Der Standardstatus liegt unter `.local/manage-git-project/`; dieser Bereich
-muss ignoriert sein. Passe die Ablage mit `--state-dir` an Projektkonventionen
-an. Das Werkzeug ändert `.gitignore` nicht selbst. `--repo` wählt bei Bedarf
-einen anderen Checkout innerhalb des kanonischen Projektordners.
+Eine reine Lesefrage benötigt keinen Aufgabenstatus. Status und gemeinsame
+Koordination liegen unter `.local/manage-git-project/`; dieser Bereich und neue
+Worktrees müssen ignoriert sein. `--state-dir` verlegt die Aufgabenakten, nicht
+die gemeinsamen Locks. Das Werkzeug ändert `.gitignore` nicht selbst.
 
-## Während der Arbeit
+## Arbeit und Abschluss
 
-- Erfasse eigene Aufgabenbranches unmittelbar nach dem Anlegen mit
-  `track-branch --branch <Name>`. Bereits vorhandene Zweige nur bei tatsächlicher
-  Aufgabenverantwortung und mit `--reason` übernehmen. Der Integrationsbranch
-  darf nicht als löschbarer Aufgabenbranch geführt werden.
-- Erfasse relevante Ergebnisse und temporäre Ausgaben mit
-  `artifact --path <Pfad> --disposition retain|temporary`. Erhalte relevante
-  bearbeitbare Quellen und Ergebnisse; archiviere nicht wahllos Toolcaches oder
-  vollständige Gespräche. Geheimnisse und lokale Laufzeitdaten gehören in
-  geeignete ignorierte Projektbereiche, nicht in Git.
-- Für vorhandene externe Dateien nutze `artifact --disposition migrate
-  --path <Quelle> --destination <Projektziel>` vor der Übertragung. Prüfe und
-  übernimm den vollständigen relevanten Inhalt, bevor die Quelle entfernt wird.
-  Die Abschlussprüfung verlangt identische Inhalte und eine entfernte Quelle.
-- `external-control` ist ausschließlich für ausdrücklich beauftragte allgemeine
-  Benutzerkonfiguration mit benanntem Pfad und konkreter `--reason` vorgesehen,
-  etwa die benutzerweite `AGENTS.md`; es ist keine Ausnahme für Projektausgaben.
-- Lies [Integration und Abschluss](references/closure.md), sobald Branches,
-  zusätzliche Worktrees, Remote-Bereinigung oder eine offene Übergabe betroffen
-  sind. Ein vollständig beauftragter Ablauf wird ohne zusätzliche pauschale
-  Bestätigung ausgeführt; fehlende echte Freigaben bleiben gültige Grenzen.
-
-## Abschluss
-
-Prüfe die fachliche Arbeit angemessen und befolge die geltenden Commit-/Push-
-Regeln. Integriere fertige, freigegebene Änderungen in den vorgesehenen Zielstand.
-Verworfene Versuche nicht automatisch mergen. Bereinige ausschließlich erledigte
-eigene Zweige und redundante Arbeitskopien nach erneutem Abgleich. Offene Arbeit
-bleibt mit konkretem Zweck erhalten; sie gilt als dokumentierte Übergabe.
+Erfasse relevante Ergebnisse und temporäre Bestände mit `artifact --path <Pfad>
+--disposition retain|temporary`. Committe nur eigene Änderungen nach den
+Projektregeln. Führe erforderliche Tests und Reviews aus. Starte anschließend
+`complete` vom kanonischen Projekt aus mit dem tatsächlichen Prüfkommando:
 
 ```sh
-python3 <Skill>/scripts/project.py --project-root <Projekt> --task <Kennung> check
-python3 <Skill>/scripts/project.py --project-root <Projekt> --task <Kennung> finish
+python3 <Skill>/scripts/project.py --project-root <Projekt> --task <Kennung> complete --idle-evidence <AgentenUndProzessprüfung> --test-command <Programm> <Argumente>
 ```
 
-`check` liefert bei offenen Befunden Exitcode 1, eine verweigerte Operation
-Exitcode 2. `finish` schließt nur nach erfolgreicher Prüfung und gibt dann den
-Lock frei. Für eine tatsächlich offene Übergabe sind `retain` und
-`finish --outcome handoff --reason <Grund>` vorgesehen. Berichte Ergebnisorte,
-Prüfungen, Git-Stand, nicht veröffentlichte Commits und begründet offene Ressourcen.
+`complete` prüft den Aufgabenstand und den kombinierten Integrationsstand,
+reserviert den Zielcheckout für die Integration, übernimmt den geprüften Merge
+und entfernt erledigte eigene Branches und Worktrees nach erneutem Abgleich.
+Ein belegter Konflikt wird im eigenen Worker gelöst und erneut geprüft.
+Bei belegtem parallelem Zielbesitz mit `--wait 30` erneut versuchen, solange der
+andere Chat Fortschritte macht. Stehle keine Locks. Details zu Wiederaufnahme,
+Remote-Veröffentlichung und Datenbeständen stehen in der Automationsreferenz.
 
-Die Prüfung umfasst den erfassten Checkout, seine registrierten Worktrees und
-die deklarierten Artefakte. Sie überwacht keine beliebigen Schreibvorgänge des
-Betriebssystems und findet nicht automatisch jede unbekannte externe Datei.
-Der Lock koordiniert Agenten, die diesen Ablauf verwenden; aktive fremde
-Prozesse und nicht kooperierende Schreiber müssen zusätzlich geprüft werden.
+Für übernommene Altbestände, manuelle Integrationsstrategien, externe Artefakte
+und offene Übergaben lies [Integration und Abschluss](references/closure.md).
+Die bisherigen Befehle `begin`, `track-branch`, `check` und `finish` bleiben
+für diese Fälle verfügbar. Verworfene Versuche nur nach klarer Entscheidung
+entfernen. Unfertige oder noch nicht freigegebene Arbeit bleibt mit konkretem
+Zweck als Übergabe erhalten.
+
+Berichte Ergebnisorte, Prüfungen, Integration, Veröffentlichung und begründet
+offene Ressourcen. Nach abgeschlossenem Status keine weitere Arbeit anhängen.
+Der kooperative Lock ersetzt keine Prüfung fremder Schreiber und ist keine
+Betriebssystem-Schreibsperre. Unbekannte externe Dateien werden nicht vollständig
+inventarisiert; deklarierte Artefakte und tatsächliche Dateibestände abgleichen.
 
 ## Selbsttest
 
@@ -101,6 +78,5 @@ Prozesse und nicht kooperierende Schreiber müssen zusätzlich geprüft werden.
 python3 <Skill>/tests/test_project.py --scratch-root <Projekt>/.local/manage-git-project-tests --report <Projekt>/.local/manage-git-project-tests.json
 ```
 
-Der Test verwendet echte synthetische Git-Repositories und lokale Bare-Remotes,
-keine GitHub-Schreibzugriffe. Native Plattformprüfungen nur für das tatsächlich
-ausgeführte Betriebssystem behaupten.
+Die Tests verwenden echte lokale Git-Repositories und Bare-Remotes. Behaupte
+native Plattformprüfungen nur für tatsächlich ausgeführte Betriebssysteme.
