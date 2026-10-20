@@ -52,6 +52,10 @@ bindet die ausgeführten Tests an die Quellhashes. Der
 Korrekturen. Die Installation eines zusätzlichen
 Pakets ist für Skill-Skript und Verhaltenstests nicht erforderlich.
 
+Die [öffentliche Installationsprüfung](docs/public-install-v1.0.0.md) belegt
+anonyme Installation vom Tag `v1.0.0`, einen vollständigen Aufgabenablauf und die
+46 Verhaltenstests aus der isoliert installierten Kopie.
+
 ## Herkunft
 
 Der ursprünglich unverändert übernommene Skill stammt aus Commit

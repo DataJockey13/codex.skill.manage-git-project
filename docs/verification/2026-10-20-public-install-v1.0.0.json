@@ -1,0 +1,77 @@
+{
+  "release": "v1.0.0",
+  "repository": "https://github.com/DataJockey13/codex.skill.manage-git-project",
+  "tag_commit": "5cbf355f2a22255825299b81b5299332df01a454",
+  "anonymous_network_access": true,
+  "installation_methods": [
+    "download",
+    "git"
+  ],
+  "installed_source_sha256": {
+    "SKILL.md": "4dd363aec250372a710ed8f41d87697baa7109bbc1811765437cc58e9db2cb6c",
+    "references/closure.md": "1952e33f2b6c4453061fa9d6935eac2c2579d21dda464107ceb98b7dc5faeda2",
+    "scripts/project.py": "b03d115d0584aabdd551c3fbe5e562aea4b3401ae0ca0a27582a6cce0bac5bd5",
+    "tests/test_project.py": "954a9ef6993eec200f271e0ecf8901af699c54c59dd1fdc19dc44e8b1365aa88"
+  },
+  "release_archive_sha256": "79e805bb5e096d96d34579d3cf07147fbb92cfff91722a64e659d77ff4a1f64f",
+  "release_archive_matches_installation": true,
+  "installer_sha256": "38f311b75664bb063808f982c600271ebc4b560830f491705190f88a94e3e781",
+  "runtime": {
+    "python": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]",
+    "platform": "darwin",
+    "machine": "arm64",
+    "prefix": "/Users/dj/Source/codex.skill.manage-git-project/.local/public-install-v1-2026-10-20/python",
+    "packages": []
+  },
+  "workflow": {
+    "target": "develop",
+    "remote": "local bare repository",
+    "passed": true,
+    "integration_commit": "343f2635840f85cb48cea1ec7f03aade4d7760ce",
+    "task_branch_tip": "b43fc40cbf694ab5a1ca23468cf04302ae620f7e",
+    "own_branches_remaining": [],
+    "additional_worktrees_remaining": [],
+    "task_locks_remaining": [],
+    "foreign_draft_preserved": true,
+    "ignored_content_migrated": true,
+    "closure_passed": true
+  },
+  "behavior_tests": {
+    "tests": 46,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 21.511,
+    "platform": "darwin",
+    "git": "git version 2.50.1 (Apple Git-155)",
+    "scratch_root": "/Users/dj/Source/codex.skill.manage-git-project/.local/public-install-v1-2026-10-20/behavior-repositories",
+    "remaining_test_fixtures": []
+  },
+  "subprocess_checks": 48,
+  "harness_sha256": "efdc191607be7891264bd113f79ffe78ba70a5c648a745d5146372ed54ec711e",
+  "limits": [
+    "Isolated environment variables, Python venv and test directories on macOS; no OS sandbox, container or VM.",
+    "No live Codex session or automatic skill selection was exercised.",
+    "No native Windows or Linux execution."
+  ],
+  "isolated_environment_removed": true,
+  "date": "2026-10-20",
+  "user_configuration_and_installation_unchanged": true,
+  "expected_refusals": [
+    "lock-conflict",
+    "early-finish-blocked",
+    "unmerged-removal-blocked",
+    "unpublished-target-blocked",
+    "ignored-removal-blocked",
+    "remote-branch-blocked",
+    "temporary-artifact-blocked"
+  ],
+  "local_evidence_sha256": {
+    "result.json": "01efccfd3d9403f492c531355eddfba737118a36fbd28144a4aa254cf21b9682",
+    "run.log": "9d7769f39e19e60046d622b2e71a937e1d37c6b0172d48e056a57297a342efdf",
+    "commands.json": "07248c9e8da55e934c1cc637f0104fc89cc5c5c53c20b254b1fc6686cea99ff9",
+    "fixture-closure.json": "7668928b8bd7ba048ed6c3ddfe2573d5873770a91c7a9a142ec9ac52577a8396",
+    "behavior-tests.json": "513e47bfe854a9d62481f08a79413f6b6aafd01fcd0c5739dbd32976fc1f78b8",
+    "user-installation-before.json": "7c9eefcdd62e7c947eadc25d04f3d8b2b04926721b112adbcc2a9f726f6a097e"
+  }
+}
