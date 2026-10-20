@@ -45,6 +45,21 @@ benutzerweite Git-Konfiguration.
 Der frühere [Parallelitätsnachweis](automatic-worktrees.md) mit zwei unabhängigen
 Agenten-Chats in zwei Runden gilt für dieselben unveränderten Skill-Dateien.
 
+## Öffentliche Installation nach Veröffentlichung
+
+Nach Veröffentlichung wurde das feste Tag `v1.1.0` anonym über HTTPS abgefragt.
+Der offizielle Skill Installer konnte den Skill sowohl per Download als auch
+per Git in neue isolierte Zielordner installieren. Alle sechs installierten
+Dateien stimmen bytegenau mit dem vollständig geprüften Paket überein; beide
+installierten CLIs starten erfolgreich.
+
+Die öffentlich heruntergeladenen Release-Dateien stimmen mit den zuvor geprüften
+Dateien, den SHA-256-Angaben der GitHub-Assets und der beigefügten Prüfsumme
+überein. GitHub weist `v1.1.0` als neuestes stabiles Release aus. Die README im Tag
+verwendet den festen Ref `v1.1.0`. Die Testumgebung wurde anschließend entfernt.
+Der [öffentliche Installationsbeleg](verification/2026-10-20-public-install-v1.1.0.json)
+enthält Tagcommit, Downloadlinks, Hashes und geprüfte Installationsmethoden.
+
 ## Grenzen
 
 Die Umgebung war durch Verzeichnisse, Umgebungsvariablen und Python-venv isoliert;

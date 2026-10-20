@@ -1,0 +1,45 @@
+{
+  "release": "v1.1.0",
+  "release_url": "https://github.com/DataJockey13/codex.skill.manage-git-project/releases/tag/v1.1.0",
+  "tag_commit": "0c82ed315bc585461a1dc8be57c90634269a073b",
+  "checked_at": "2026-10-20T11:11:24.334578+00:00",
+  "anonymous_network_access": true,
+  "installation_methods": [
+    "download",
+    "git"
+  ],
+  "installer_sha256": "38f311b75664bb063808f982c600271ebc4b560830f491705190f88a94e3e781",
+  "installed_source_sha256": {
+    "SKILL.md": "131c745c3bce6c641aae59386b13048b091ea0913cb63767c63f532ae9f75660",
+    "references/automation.md": "c232e6b9bf3c689c863bb266c656243627ab657b7823bff321624a4e2df99c64",
+    "references/closure.md": "0e034858f57c74f8b33af7b4e19850068a2a597c0f72ecc18b614e574443c433",
+    "scripts/automation.py": "5879a1386a839b3e3ffec9265972fed54d60e025322ff674a4cc7ea99a6542a6",
+    "scripts/project.py": "6a76b6ce21cce87dbd907900acc424254f56cf53f3667208f7eba057b2de3bbe",
+    "tests/test_project.py": "5064ec57f85212f4485c03bc5fb33750751f1e96fa233ac1902681626903f55c"
+  },
+  "runtime": {
+    "python": "3.9.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "packages": []
+  },
+  "assets": {
+    "manage-git-project-v1.1.0.zip": {
+      "sha256": "aa178a9ac8fcbbff637349f5ee650c631a31fab244b97e385e8baa9c4659dfa1",
+      "url": "https://github.com/DataJockey13/codex.skill.manage-git-project/releases/download/v1.1.0/manage-git-project-v1.1.0.zip",
+      "size_bytes": 33692
+    },
+    "manage-git-project-v1.1.0.zip.sha256": {
+      "sha256": "cad679c2a54870fab469b96acfe5f48b3ab30d1916fff035eff9a1e696a158f6",
+      "url": "https://github.com/DataJockey13/codex.skill.manage-git-project/releases/download/v1.1.0/manage-git-project-v1.1.0.zip.sha256",
+      "size_bytes": 96
+    }
+  },
+  "assets_identical_to_tested_package": true,
+  "latest_release": "v1.1.0",
+  "tagged_readme_pins_release": true,
+  "limits": [
+    "Isolated directories, environment variables and Python venv on macOS; no OS sandbox/container.",
+    "No native Windows/Linux execution."
+  ],
+  "isolated_environment_removed": true
+}
